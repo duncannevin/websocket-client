@@ -2,18 +2,24 @@
   <div class="input-area">
     <h1>{{title}}</h1>
     <strong>Location:</strong><br>
-    <input id="ws-uri" size="35" value="ws://localhost:9000/ws/levels">
+    <input id="ws-uri" size="35" value="wss://echo.websocket.org">
     <br>
     <button id="connect">Connect</button>
     <button id="disconnect" disabled>Disconnect</button>
     <br>
     <br>
     <strong>JSON message:</strong><br>
-    <input id="send-message" size="35" disabled="">
+    <textarea id="send-message" disabled=""></textarea>
     <br>
     <button id="send" disabled="">Send</button>
     <br>
     <button id="clear-log">Clear Log</button>
+    <br>
+    <br>
+    <strong>Add a cookie for auth</strong>
+    <input id="cookie" size="35">
+    <br>
+    <button id="apply-cookie">Apply Cookie</button>
   </div>
   <div id="output"></div>
 </div>

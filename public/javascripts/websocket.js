@@ -1,4 +1,5 @@
-var wsUri, websocket, output, disconnect, connect, send, sendMessage, message, clearLog;
+var wsUri, websocket, output, disconnect, connect, send, sendMessage, message, clearLog,
+  cookie, applyCookie;
 var resCount = 0;
 
 function connectSocket () {
@@ -46,10 +47,14 @@ function onError (evt) {
   writeToScreen('<span style="color: red;">ERROR: </span> ', evt.data);
 }
 
+function convertToJs(jsonStr) {
+  return eval('(' + jsonStr + ')');
+}
+
 function doSend () {
   var message = sendMessage.value;
   writeToScreen('<span style="color: blue;">SENT: </span>', message);
-  message = eval('(' + message + ')');
+  message = convertToJs(message);
   websocket.send(JSON.stringify(message));
 }
 
@@ -74,6 +79,32 @@ function clearOutput () {
   output.innerHTML = "";
 }
 
+function sendCookie () {
+  fetch('/setcookie', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Cache': 'no-cache'
+    },
+    body: JSON.stringify(convertToJs(cookie.value))
+  })
+    .then(function (res) {
+      return res.json()
+    })
+    .then(function (res) {
+      writeToScreen('COOKIE SET', JSON.stringify(res));
+    })
+    .catch(function (err) {
+      writeToScreen('<span style="color: red;">ERROR: </span> ', err.message)
+    })
+}
+
+function removeCookies () {
+
+}
+
 function init () {
   output = document.getElementById("output");
   connect = document.getElementById("connect");
@@ -81,13 +112,17 @@ function init () {
   send = document.getElementById("send");
   sendMessage = document.getElementById("send-message");
   clearLog = document.getElementById("clear-log");
+  cookie = document.getElementById("cookie");
+  applyCookie = document.getElementById("apply-cookie");
 
   sendMessage.value = '{"action": "get-stats"}';
+  cookie.value = '{"key": "value"}';
 
   connect.addEventListener("click", connectSocket);
   disconnect.addEventListener("click", disconnectSocket);
   send.addEventListener("click", doSend);
-  clearLog.addEventListener("click", clearOutput)
+  clearLog.addEventListener("click", clearOutput);
+  applyCookie.addEventListener("click", sendCookie);
 }
 
 window.addEventListener("load", init, false);
