@@ -112,7 +112,7 @@ function init () {
   send = document.getElementById("send");
   sendMessage = document.getElementById("send-message");
   clearLog = document.getElementById("clear-log");
-  cookie = document.getElementById("cookie");
+  cookie = document.getElementById("cookie-input");
   applyCookie = document.getElementById("apply-cookie");
 
   sendMessage.value = '{"action": "get-stats"}';
