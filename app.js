@@ -18,7 +18,7 @@ dotenv.config()
 // Connect to MongoDB
 const mongoUrl = process.env.MONGODB_URI
 mongoose.Promise = bluebird
-mongoose.connect(mongoUrl, {useNewUrlParser: true})
+mongoose.connect(mongoUrl, {useNewUrlParser: true, useCreateIndex: true})
   .then(() => console.log('MongoDB connected:', process.env.MONGODB_URI))
   .catch((err) => console.error('MongoDB connection failed:', process.env.MONGODB_URI, err))
 

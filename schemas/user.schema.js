@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const bCrypt = require('bCrypt')
+const bCrypt = require('bcrypt')
 const uniqId = require('uniqid')
 const util = require('util')
 const {userIdPrefix} = require('../utils/names.util')
