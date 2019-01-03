@@ -88,7 +88,7 @@ function clearOutput() {
 }
 
 function sendCookie() {
-  fetch('/setcookie', {
+  fetch('/client_cookie/setcookie', {
     method: 'POST',
     credentials: 'same-origin',
     headers: {
