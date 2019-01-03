@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const bCrypt = require('bCrypt')
 const uniqId = require('uniqid')
 const util = require('util')
-const {userIdPrefix} = require('../utils/names.utils')
+const {userIdPrefix} = require('../utils/names.util')
 const userModel = require('../models/user.model')
 const UserSchema = new mongoose.Schema(userModel)
 
