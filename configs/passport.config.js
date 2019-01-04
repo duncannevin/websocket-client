@@ -37,8 +37,8 @@ function config (passport) {
    * @description Local auth
    */
   passport.use(new LocalStrategy({
-    usernameField: 'user[email]',
-    passwordField: 'user[password]'
+    usernameField: 'email',
+    passwordField: 'password'
   }, localAuthCallback))
 
   /**

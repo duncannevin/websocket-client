@@ -1,6 +1,12 @@
 const jwt = require('express-jwt')
 
-function _getTokenFromHeaders (req) {
+/**
+ *
+ * @param req
+ * @return {*}
+ * @private
+ */
+function _getTokenFromHeaders(req) {
   const {headers: {authorization}} = req
 
   if (authorization && authorization.split(' ')[0] === 'Token') {
@@ -10,14 +16,26 @@ function _getTokenFromHeaders (req) {
   return null
 }
 
+/**
+ * @description secret must come from a cb since it is a env variable
+ * @param req
+ * @param payload
+ * @param done
+ * @private
+ */
+function _getSecret (req, payload, done) {
+  const secret = process.env.SESSION_SECRET
+  done(null, secret)
+}
+
 const required = jwt({
-  secret: 'secret',
+  secret: _getSecret,
   userProperty: 'payload',
   getToken: _getTokenFromHeaders
 })
 
 const optional = jwt({
-  secret: 'secret',
+  secret: _getSecret,
   userProperty: 'payload',
   getToken: _getTokenFromHeaders,
   credentialsRequired: false

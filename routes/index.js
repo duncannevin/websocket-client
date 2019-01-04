@@ -8,6 +8,6 @@ const userRouter = require('./user.route')
 router.use('/', indexRouter)
 router.use('/client_cookie', clientCookieRouter)
 router.use('/auth', authRouter)
-router.use('/user', userRouter)
+router.use('/users', userRouter)
 
 module.exports = router

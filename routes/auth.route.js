@@ -5,8 +5,7 @@ const authControl = require('../controllers/auth.control')
 const passport = require('passport')
 
 authRouter.post('/register', optional, authControl.register)
-authRouter.post('/login', optional, passport.authenticate('local', {session: false}, authControl.login))
-authRouter.get('/current', required, authControl.current)
+authRouter.post('/login', optional, authControl.login)
 // authRouter.get('/github', authControl.socialAuth('github', {session: false}));
 // authRouter.get('/github/callback', authControl.socialAuth('github'), authControl.activate);
 // authRouter.get('/google', authControl.socialAuth('google', { scope: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/plus.profile.emails.read'], session: false }));

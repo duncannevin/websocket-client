@@ -2,13 +2,13 @@ const {validateLogin} = require('../utils/req_validators.util')
 const userDAO = require('../daos/user.dao')
 const {getLogger} = require('log4js')
 const authLogger = getLogger('auth')
-const mongoose = require('mongoose')
-const Users = mongoose.model('users')
+const passport = require('passport')
 
 class AuthControl {
   async register (req, res) {
     const user = req.body
     user.auth_method = 'local'
+    user.role = 'guest'
     const validationErrors = validateLogin(req)
     if (validationErrors) {
       return res.status(422).send({msg: validationErrors, code: 422})
@@ -17,35 +17,26 @@ class AuthControl {
       const addedUser = await userDAO.save(user)
       res.status(200).send({user: addedUser})
     } catch (error) {
+      if (error.code === 11000) {
+        return res.status(409).send({msg: 'Email already exists', code: error.code})
+      }
       authLogger.debug(error)
-      res.status(400).send({msg: error})
+      res.status(400).send({msg: error, code: error.code})
     }
   }
 
-  async login (req, res) {
-    const {body: {user}} = req
+  login (req, res, next) {
     const validationErrors = validateLogin(req)
     if (validationErrors) {
-      return res.status(401).send({msg: validationErrors, code: 401})
+      return res.status(422).send({msg: validationErrors, code: 422})
     }
-    try {
-      const foundUser = await userDAO.updateOrCreate(user.email)
-      res.status(200).send({user: foundUser.toAuthJSON()})
-    } catch (error) {
-      authLogger.debug(error)
-      res.status(400).send({msg: error})
-    }
-  }
-
-  async current (req, res) {
-    const {payload: {id}} = req
-    try {
-      const user = await userDAO.findById(id)
-      res.status(200).send({user: user.toAuthJSON()})
-    } catch (error) {
-      authLogger.debug(error)
-      res.status(400).send({msg: error})
-    }
+    return passport.authenticate('local', {session: false}, (err, passportUser, info) => {
+      if (err) return next(err)
+      if (passportUser) {
+        passportUser.generateJWT()
+        return res.status(200).send({user: passportUser.toAuthJSON()})
+      }
+    })(req, res, next)
   }
 }
 

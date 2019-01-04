@@ -4,7 +4,6 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const dotenv = require('dotenv')
-const url = require('url')
 const bluebird = require('bluebird')
 const mongoose = require('mongoose')
 const log4js = require('log4js')
@@ -43,9 +42,9 @@ app.use(passport.session())
 
 // routes
 app.use(router)
-// app.use('*', function (req, res) {
-//   res.redirect(url.parse(req.url).pathname)
-// })
+app.use('*', function (req, res) {
+  res.redirect(url.parse(req.url).pathname)
+})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
