@@ -45,10 +45,13 @@ class UserDAO {
   /**
    * @description Saves the user in the storage
    * @param user
-   * @returns {Promise<user.model>}
+   * @returns {Promise<User<toAuthJSON>>}
    */
   async save(user) {
-    return (await new UserRepository(user).save()).toObject({virtuals: true})
+    const newUser = new UserRepository(user)
+    newUser.setPassword(user.password)
+    await newUser.save()
+    return newUser.toAuthJSON()
   }
 
   /**

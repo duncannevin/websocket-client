@@ -8,8 +8,9 @@ const url = require('url')
 const bluebird = require('bluebird')
 const mongoose = require('mongoose')
 const log4js = require('log4js')
-const {indexRouter, clientCookieRouter, authRouter} = require('./routes/index')
+const router = require('./routes')
 const passport = require('passport')
+const expressValidator = require('express-validator')
 const app = express()
 
 // Set environment variables
@@ -30,6 +31,7 @@ app.set('view engine', 'hbs')
 require('./configs/passport.config')(passport)
 
 // configure
+app.use(expressValidator())
 app.use(log4js.connectLogger(log4js.getLogger('http'), {level: 'auto'}))
 app.use(logger('dev'))
 app.use(express.json())
@@ -40,12 +42,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // routes
-app.use('/', indexRouter)
-app.use('/client_cookie', clientCookieRouter)
-app.use('/auth', authRouter)
-app.use('*', function (req, res) {
-  res.redirect(url.parse(req.url).pathname)
-})
+app.use(router)
+// app.use('*', function (req, res) {
+//   res.redirect(url.parse(req.url).pathname)
+// })
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

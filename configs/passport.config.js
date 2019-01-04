@@ -1,29 +1,46 @@
 const GitHubStrategy = require('passport-github2')
 const GoogleStrategy = require('passport-google-oauth2')
+const LocalStrategy = require('passport-local')
 const {userDAO} = require('../daos')
-const {activationExpiration, activationTokenGen} = require('../controllers/helpers')
-const {authLogger} = require('../utils/logger.util')
+const authLogger = require('log4js').getLogger('auth')
 
 async function oauth2Callback(request, accessToken, refreshToken, profile, done) {
   const user = {
-    display_name: profile.displayName,
     email: profile.emails[0].value,
-    user_id: `${profile.provider}|${profile.id}`,
-    role: 'guest'
+    role: 'guest',
+    auth_method: 'oauth2'
   }
   try {
-    user.activationToken = await activationTokenGen()
-    user.activationExpires = activationExpiration() // does nothing at this point(not sure I will ever implement)
-    const addedUser = await userDAO.updateOrCreate(user)
-    authLogger.info('oauth2 successful', profile.provider)
-    done(undefined, addedUser)
+    const user = await userDAO.updateOrCreate(user)
+    done(null, user)
   } catch (error) {
-    authLogger.debug('oauth2 failed', profile.provider, error)
-    done(error, undefined)
+    authLogger.debug(profile.provider + ' oauth2 failed', error)
+    done(error, null)
+  }
+}
+
+async function localAuthCallback (email, password, done) {
+  try {
+    const user = await userDAO.findByEmail(email)
+    if (!user || !user.validatePassword(password)) {
+      return done(null, false, {errors: {'email or password': 'is invalid'}})
+    }
+    return done(null, user)
+  } catch (error) {
+    authLogger.debug('local auth failed', error)
+    done(error, null)
   }
 }
 
 function config (passport) {
+  /**
+   * @description Local auth
+   */
+  passport.use(new LocalStrategy({
+    usernameField: 'user[email]',
+    passwordField: 'user[password]'
+  }, localAuthCallback))
+
   /**
    * @description Github oauth
    */

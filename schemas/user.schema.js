@@ -1,42 +1,39 @@
 const mongoose = require('mongoose')
-const bCrypt = require('bcrypt')
-const uniqId = require('uniqid')
-const util = require('util')
-const {userIdPrefix} = require('../utils/names.util')
+const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 const userModel = require('../models/user.model')
+
 const UserSchema = new mongoose.Schema(userModel)
 
-UserSchema.pre('save', function save(next) {
-  const user = this
-  if (!user.isModified('password')) {
-    return next()
-  }
-  bCrypt.genSalt(10, (err, salt) => {
-    if (err) {
-      return next(err)
-    }
-    bCrypt.hash(user.password, salt, __, (err, hash) => {
-      if (err) {
-        return next(err)
-      }
-      user.password = hash
-      next()
-    })
-  })
-})
-
-UserSchema.pre('save', function (next) {
-  const user = this
-  if (!user.hasOwnProperty('user_id')) {
-    user.user_id = uniqId(userIdPrefix + '-')
-  }
-  next()
-})
-
-UserSchema.methods.comparePassword = function (candidatePassword) {
-  const qCompare = util.promisify(bCrypt.compare)
-  return qCompare(candidatePassword, this.password)
+UserSchema.methods.setPassword = function (password) {
+  this.salt = crypto.randomBytes(16).toString('hex')
+  this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex')
 }
 
-const UserRepository = mongoose.model('UserMdl', UserSchema)
+UserSchema.methods.validatePassword = function (password) {
+  const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex')
+  return this.hash === hash
+}
+
+UserSchema.methods.generateJWT = function () {
+  const today = new Date()
+  const expirationDate = new Date(today)
+  expirationDate.setDate(today.getDate() + 60)
+
+  return jwt.sign({
+    email: this.email,
+    id: this._id,
+    exp: parseInt(expirationDate.getTime() / 1000, 10)
+  }, process.env.SESSION_SECRET)
+}
+
+UserSchema.methods.toAuthJSON = function () {
+  return {
+    _id: this._id,
+    email: this.email,
+    token: this.generateJWT()
+  }
+}
+
+const UserRepository = mongoose.model('users', UserSchema)
 module.exports = UserRepository
