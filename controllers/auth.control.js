@@ -7,7 +7,7 @@ const passport = require('passport')
 class AuthControl {
   async register (req, res) {
     const user = req.body
-    user.auth_method = 'local'
+    user.method = 'local'
     user.role = 'guest'
     const validationErrors = validateLogin(req)
     if (validationErrors) {

@@ -8,7 +8,7 @@ async function oauth2Callback(request, accessToken, refreshToken, profile, done)
   const user = {
     email: profile.emails[0].value,
     role: 'guest',
-    auth_method: 'oauth2'
+    method: 'oauth2'
   }
   try {
     const user = await userDAO.updateOrCreate(user)

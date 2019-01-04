@@ -1,8 +1,5 @@
 module.exports = {
-  email: {
-    type: String,
-    unique: true
-  },
+  email: String,
   auth_method: String,
   hash: String,
   salt: String,
