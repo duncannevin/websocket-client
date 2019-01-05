@@ -1,11 +1,9 @@
 const mongoose = require('mongoose')
 const crypto = require('crypto')
-const jwt = require('jsonwebtoken')
 const userModel = require('../models/user.model')
+const {jwtGen} = require('../utils')
 
 const UserSchema = new mongoose.Schema(userModel)
-
-UserSchema.index({email: 1, method: 1}, {unique: true})
 
 UserSchema.methods.setPassword = function (password) {
   this.salt = crypto.randomBytes(16).toString('hex')
@@ -18,16 +16,11 @@ UserSchema.methods.validatePassword = function (password) {
 }
 
 UserSchema.methods.generateJWT = function () {
-  const today = new Date()
-  const expirationDate = new Date(today)
-  expirationDate.setDate(today.getDate() + 60)
-
-  return jwt.sign({
-    email: this.email,
-    id: this._id,
-    role: this.role,
-    exp: parseInt(expirationDate.getTime() / 1000, 10)
-  }, process.env.SESSION_SECRET)
+  return jwtGen({
+      email: this.email,
+      id: this._id,
+      role: this.role
+    })
 }
 
 UserSchema.methods.toAuthJSON = function () {

@@ -10,7 +10,11 @@ const log4js = require('log4js')
 const router = require('./routes')
 const passport = require('passport')
 const expressValidator = require('express-validator')
+const session = require('express-session')
+const mongo = require('connect-mongo')
+const expressJwt = require('express-jwt')
 const app = express()
+const MongoStore = mongo(session)
 
 // Set environment variables
 dotenv.config()
@@ -39,6 +43,15 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(session({
+  resave: true,
+  saveUninitialized: true,
+  secret: process.env.SESSION_SECRET,
+  store: new MongoStore({
+    url: mongoUrl,
+    autoReconnect: true
+  })
+}))
 
 // routes
 app.use(router)

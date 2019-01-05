@@ -34,12 +34,12 @@ class UserDAO {
   }
 
   /**
-   * @description Fetches single user by user_id
+   * @description Fetches single user by oauth_id
    * @param userId
    * @returns {Promise<user.model>}
    */
-  async findByUserId(userId) {
-    return await UserRepository.findOne({user_id: userId})
+  async findByOauthId(oAuthId) {
+    return await UserRepository.findOne({oauth_id: oAuthId})
   }
 
   /**
@@ -60,7 +60,7 @@ class UserDAO {
    * @return {Promise<user.model>}
    */
   async updateOrCreate(user) {
-    return (await UserRepository.findOneAndUpdate({user_id: user.user_id}, user, {upsert: true, new: true}))
+    return (await UserRepository.findOneAndUpdate({oauth_id: user.oauth_id}, user, {upsert: true, new: true}))
   }
 
   /**
