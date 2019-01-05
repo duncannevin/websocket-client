@@ -3,7 +3,8 @@ module.exports = {
     type: String,
     trim: true,
     index: true,
-    sparse: true
+    sparse: true,
+    unique: true
   },
   method: String,
   hash: String,

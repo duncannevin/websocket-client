@@ -2,15 +2,6 @@ const {UserRepository} = require('../schemas')
 
 class UserDAO {
   /**
-   * @description Finds user by id
-   * @param id
-   * @return {Promise<user.model>}
-   */
-  async findById(id) {
-    return await UserRepository.findById(id)
-  }
-
-  /**
    * @description Fetches single user from the storage by email
    * @param email
    * @returns {Promise<user.model>}
@@ -19,48 +10,16 @@ class UserDAO {
     return await UserRepository.findOne({email: email})
   }
 
-  async findByUsername(username) {
-    return await UserRepository.findOne({username: username})
-  }
-
-  /**
-   * @description Fetches single user from the storage by email or username
-   * @param username
-   * @param email
-   * @returns {Promise<user.model>}
-   */
-  async findByUsernameOrEmail(username, email) {
-    return await UserRepository.findOne({$or: [{email: email}, {username: username}]})
-  }
-
-  /**
-   * @description Fetches single user by oauth_id
-   * @param userId
-   * @returns {Promise<user.model>}
-   */
-  async findByOauthId(oAuthId) {
-    return await UserRepository.findOne({oauth_id: oAuthId})
-  }
-
   /**
    * @description Saves the user in the storage
    * @param user
-   * @returns {Promise<User<toAuthJSON>>}
+   * @returns {Promise<user>}
    */
   async save(user) {
     const newUser = new UserRepository(user)
     newUser.setPassword(user.password)
     await newUser.save()
     return newUser.toAuthJSON()
-  }
-
-  /**
-   * @description Creates or updates a current user (for social auth)
-   * @param user
-   * @return {Promise<user.model>}
-   */
-  async updateOrCreate(user) {
-    return (await UserRepository.findOneAndUpdate({oauth_id: user.oauth_id}, user, {upsert: true, new: true}))
   }
 
   /**
@@ -73,11 +32,11 @@ class UserDAO {
 
   /**
    * @description deletes a single user record from storage
-   * @param username
    * @return {Promise<>}
+   * @param email
    */
-  async deleteOne(username) {
-    return await UserRepository.deleteOne({username: username})
+  async deleteOne(email) {
+    return await UserRepository.deleteOne({username: email})
   }
 }
 

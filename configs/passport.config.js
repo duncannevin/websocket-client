@@ -46,16 +46,6 @@ function config(passport) {
     callbackURL: 'http://localhost:3000/auth/github/callback'
   }, oauth2Callback))
 
-  /**
-   * @description Google oauth
-   */
-  passport.use(new GoogleStrategy.Strategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:3000/auth/google/callback',
-    passReqToCallback: true
-  }, oauth2Callback))
-
   passport.serializeUser(function (user, done) {
     done(null, user)
   })

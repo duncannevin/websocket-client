@@ -3,7 +3,6 @@ const userDAO = require('../daos/user.dao')
 const {getLogger} = require('log4js')
 const authLogger = getLogger('auth')
 const passport = require('passport')
-const jwt = require('jsonwebtoken')
 
 class AuthControl {
   async register (req, res, next) {
@@ -40,7 +39,7 @@ class AuthControl {
     })(req, res, next)
   }
 
-  async handleSocial (req, res, next) {
+  handleSocial (req, res, next) {
     if (!req.hasOwnProperty('user')) return res.status(400).send({msg: 'No user field provided'})
     res.status(200).send(req.user)
   }
