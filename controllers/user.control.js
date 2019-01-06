@@ -2,7 +2,7 @@ const {userDAO} = require('../daos')
 const {roleCheck} = require('../utils/req_validators.util')
 
 class UserControl {
-  async getUsers (req, res) {
+  async getUsers(req, res) {
     const validateRole = roleCheck(req, 'admin')
     if (validateRole) {
       return res.status(401).send(validateRole)

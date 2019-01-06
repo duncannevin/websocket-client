@@ -17,10 +17,10 @@ UserSchema.methods.validatePassword = function (password) {
 
 UserSchema.methods.generateJWT = function () {
   return jwtGen({
-      email: this.email,
-      id: this._id,
-      role: this.role
-    })
+    email: this.email,
+    id: this._id,
+    role: this.role
+  })
 }
 
 UserSchema.methods.toAuthJSON = function () {

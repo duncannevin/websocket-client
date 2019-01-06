@@ -23,7 +23,7 @@ function _getTokenFromHeaders(req) {
  * @param done
  * @private
  */
-function _getSecret (req, payload, done) {
+function _getSecret(req, payload, done) {
   const secret = process.env.SESSION_SECRET
   done(null, secret)
 }

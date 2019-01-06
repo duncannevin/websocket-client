@@ -6,7 +6,7 @@ const passport = require('passport')
 
 authRouter.post('/register', optional, authControl.register)
 authRouter.post('/login', optional, authControl.login)
-authRouter.get('/github', optional, passport.authenticate('github', {session: false}));
-authRouter.get('/github/callback', optional, passport.authenticate('github'), authControl.handleSocial);
+authRouter.get('/github', optional, passport.authenticate('github', {session: false}))
+authRouter.get('/github/callback', optional, passport.authenticate('github'), authControl.handleSocial)
 
 module.exports = authRouter

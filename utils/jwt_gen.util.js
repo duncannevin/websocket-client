@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-function jwtGen (payload) {
+function jwtGen(payload) {
   const today = new Date()
   const expirationDate = new Date(today)
   expirationDate.setDate(today.getDate() + 60)

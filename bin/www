@@ -6,7 +6,7 @@
 const app = require('../app')
 const debug = require('debug')('websocket-client:server')
 const http = require('http')
-const log4js = require('log4js');
+const log4js = require('log4js')
 
 /**
  * Initialise log4js first, so we don't miss any log messages

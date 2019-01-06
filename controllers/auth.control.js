@@ -5,7 +5,7 @@ const authLogger = getLogger('auth')
 const passport = require('passport')
 
 class AuthControl {
-  async register (req, res, next) {
+  async register(req, res, next) {
     const user = req.body
     user.method = 'local'
     user.role = 'guest'
@@ -25,7 +25,7 @@ class AuthControl {
     }
   }
 
-  login (req, res, next) {
+  login(req, res, next) {
     const validationErrors = validateLogin(req)
     if (validationErrors) {
       return res.status(422).send({msg: validationErrors, code: 422})
@@ -40,8 +40,8 @@ class AuthControl {
     })(req, res, next)
   }
 
-  handleSocial (req, res, next) {
-    if (!req.hasOwnProperty('user')) return res.status(400).send({msg: 'No user field provided'})
+  handleSocial(req, res, next) {
+    if (!req.hasOwnProperty('user')) return res.status(400).send({msg: 'No user field provided', code: 400})
     res.status(200).send(req.user)
   }
 }
