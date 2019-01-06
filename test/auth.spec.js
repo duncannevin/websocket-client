@@ -1,103 +1,87 @@
 const chai = require('chai');
+const {expect} = chai
 const chaiHttp = require('chai-http');
 const app = require('../app')
 const {userDAO} = require('../daos')
+const jwt = require('jsonwebtoken')
 const should = chai.should()
 chai.use(chaiHttp)
 const userForm = {
   email: 'tester@chester.com',
-  password: 'PASSWORD',
-  lname: 'Tester',
-  fname: 'Chester',
-  role: 'guest',
-  username: 'testerchester'
+  password: 'PASSWORD'
 }
-
-let user, JWT
 
 function authSpec () {
   beforeEach((done) => {
     done()
   })
 
-  afterEach((done) => {
-    try {
-      userDAO.deleteOne(userForm.username)
-      done()
-    } catch (error) {
-      console.error(error)
-    }
+  after(function (done) {
+    userDAO.deleteOne(userForm.email)
+    done()
   })
 
   describe('POST /register', () => {
     const route = '/auth/register'
 
-    it('should return 201', (done) => {
+    it('should return 201 when a new user is added', (done) => {
       chai.request(app)
         .post(route)
         .send(userForm)
         .end((err, res) => {
           if (err) return console.log(err)
           res.should.have.status(201)
-          res.body.should.have.property('user_id')
+          res.body.should.have.property('user')
+          expect(res.body.user).to.have.keys(['_id', 'email', 'token'])
+          expect(jwt.verify(res.body.user.token, process.env.SESSION_SECRET)).to.be.an('object')
+          expect(jwt.verify(res.body.user.token, process.env.SESSION_SECRET)).to.have.keys(['exp', 'email', 'id', 'role', 'iat'])
           done()
         })
     })
 
-    it('should return 409', (done) => {
+    it('should return 409 if user already exists', (done) => {
       chai.request(app)
         .post(route)
         .send(userForm)
         .end((err, res) => {
           if (err) return console.log(err)
           res.should.have.status(409)
+          res.body.should.have.keys(['msg', 'code'])
           done()
         })
     })
   })
 
-  // describe('GET /activate/:activationToken', () => {
-  //   const route = '/auth/activate'
-  //   const BAD_TOKEN = '123456789'
-  //
-  //   it('should return 400', (done) => {
-  //     chai.request(app).get(`${route}/${BAD_TOKEN}`)
-  //       .expect(400, done)
-  //   })
-  //
-  //   it('should return 200', (done) => {
-  //     chai.request(app).get(`${route}/${user.activationToken}`)
-  //       .then(res => {
-  //         JWT = res.body.token
-  //         expect(res.status).toEqual(200)
-  //         done()
-  //       })
-  //   })
-  // })
-  //
-  // describe('POST /login', () => {
-  //   const route = '/auth/login'
-  //
-  //   it('should return 401, missing password', (done) => {
-  //     chai.request(app).post(route).send({email: 'some@email.com'})
-  //       .expect(401, done)
-  //   })
-  //
-  //   it('should return 401, missing email', (done) => {
-  //     chai.request(app).post(route).send({password: 'somepassword'})
-  //       .expect(401, done)
-  //   })
-  //
-  //   it('should return 404', (done) => {
-  //     chai.request(app).post(route).send({email: 'none@nowhere.com', password: 'PASSWORD'})
-  //       .expect(404, done)
-  //   })
-  //
-  //   it('should return 200', (done) => {
-  //     request(app).post('/auth/login').send({email: 'tester@chester.com', password: 'PASSWORD'})
-  //       .expect(200, done)
-  //   })
-  // })
+  describe('POST /login', function () {
+    const route = '/auth/login'
+
+    it('should return 200 upon successful login', (done) => {
+      chai.request(app)
+        .post(route)
+        .send(userForm)
+        .end((err, res) => {
+          if (err) return console.log(err)
+          res.should.have.status(200)
+          res.body.should.have.property('user')
+          expect(res.body.user).to.have.keys(['_id', 'email', 'token'])
+          expect(jwt.verify(res.body.user.token, process.env.SESSION_SECRET)).to.be.an('object')
+          expect(jwt.verify(res.body.user.token, process.env.SESSION_SECRET)).to.have.keys(['exp', 'email', 'id', 'role', 'iat'])
+          done()
+        })
+    })
+
+    it('should return 401 unauthorized with bad credentials', (done) => {
+      chai.request(app)
+        .post(route)
+        .send(Object.assign(userForm, {password: 'notit'}))
+        .end((err, res) => {
+          if (err) return console.log(err)
+          res.should.have.status(401)
+          res.body.should.have.keys(['msg', 'code'])
+          done()
+        })
+    })
+  })
 }
 
 module.exports = authSpec

@@ -36,7 +36,7 @@ class UserDAO {
    * @param email
    */
   async deleteOne(email) {
-    return await UserRepository.deleteOne({username: email})
+    return await UserRepository.deleteOne({email: email})
   }
 }
 

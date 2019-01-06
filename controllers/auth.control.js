@@ -15,7 +15,7 @@ class AuthControl {
     }
     try {
       const addedUser = await userDAO.save(user)
-      res.status(200).send({user: addedUser})
+      res.status(201).send({user: addedUser})
     } catch (error) {
       if (error.code === 11000) {
         return res.status(409).send({msg: 'Email already exists', code: error.code})
@@ -36,6 +36,7 @@ class AuthControl {
         passportUser.generateJWT()
         return res.status(200).send({user: passportUser.toAuthJSON()})
       }
+      return res.status(401).send({msg: 'Unauthorized', code: 401})
     })(req, res, next)
   }
 
