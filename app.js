@@ -19,8 +19,7 @@ dotenv.config()
 const mongoUrl = process.env.MONGODB_URI
 mongoose.Promise = bluebird
 mongoose.connect(mongoUrl, {useNewUrlParser: true, useCreateIndex: true})
-  .then(() => console.log('MongoDB connected:', process.env.MONGODB_URI))
-  .catch((err) => console.error('MongoDB connection failed:', process.env.MONGODB_URI, err))
+  .catch((err) => dbMsg = 'MongoDB connection failed: ' + err.code)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
