@@ -13,7 +13,8 @@
 
 .submit-form {
   margin-top: 2rem;
-  flex-direction: column; }
+  flex-direction: column;
+  align-items: center; }
   .submit-form .nav-tabs {
     border-bottom: none; }
     .submit-form .nav-tabs .nav-item .nav-link {
