@@ -1,28 +1,36 @@
+.navbar {
+  background-color: #262b2f;
+  box-shadow: 0 8px 6px -6px #1e2226;
+  border-bottom: 1px solid #000000; }
+  .navbar .navbar-brand {
+    padding: 0; }
+
+.url-form {
+  margin-top: 2rem;
+  justify-content: space-around; }
+  .url-form * {
+    margin: 0 !important; }
+
 html {
-  height: 100%;
-}
+  height: 100%; }
 
 body {
   height: 100%;
-  background-color: #000000;
-  color: #ffffff;
-}
+  background-color: #262b2f;
+  color: #ffffff; }
 
 a {
-  color: #00B7FF;
-}
+  color: #00B7FF; }
 
 .action-area {
   display: flex;
   width: 100%;
-  height: 100%;
-}
+  height: 100%; }
 
 .input-area {
   display: flex;
   flex: 1;
-  flex-direction: column;
-}
+  flex-direction: column; }
 
 #output {
   width: 50%;
@@ -31,18 +39,16 @@ a {
   flex: 3;
   flex-direction: column;
   border: 1px solid black;
-  overflow: auto;
-}
+  overflow: auto; }
 
 #output div {
-  padding: 30px;
-}
+  padding: 30px; }
 
 #output div:nth-child(odd) {
-  background-color: transparent;
-}
+  background-color: transparent; }
 
 #output div:nth-child(even) {
   color: black;
-  background-color: #D3D3D3;
-}
+  background-color: #D3D3D3; }
+
+/*# sourceMappingURL=style.css.map */

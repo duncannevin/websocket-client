@@ -133,4 +133,4 @@ function init() {
   applyCookie.addEventListener('click', sendCookie)
 }
 
-window.addEventListener('load', init, false)
+// window.addEventListener('load', init, false)

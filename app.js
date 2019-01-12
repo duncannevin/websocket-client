@@ -1,5 +1,6 @@
 const createError = require('http-errors')
 const express = require('express')
+const hbs = require('express-handlebars')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
@@ -10,6 +11,7 @@ const log4js = require('log4js')
 const router = require('./routes')
 const passport = require('passport')
 const expressValidator = require('express-validator')
+const sassMiddleware = require('node-sass-middleware')
 const app = express()
 
 // Set environment variables
@@ -22,7 +24,12 @@ mongoose.connect(mongoUrl, {useNewUrlParser: true, useCreateIndex: true})
   .catch((err) => dbMsg = 'MongoDB connection failed: ' + err.code)
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'))
+app.engine('hbs', hbs({
+  extname: 'hbs',
+  defaultLayout: 'main',
+  layoutsDir: __dirname + '/views/layouts/',
+  partialsDir: __dirname + '/views/partials/'
+}))
 app.set('view engine', 'hbs')
 
 // configure passport
@@ -35,6 +42,12 @@ app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
+app.use(sassMiddleware({
+  src: path.join(__dirname, 'public'),
+  dest: path.join(__dirname, 'public'),
+  indentedSyntax: true, // true = .sass and false = .scss
+  sourceMap: true
+}))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(passport.initialize())
 app.use(passport.session())
