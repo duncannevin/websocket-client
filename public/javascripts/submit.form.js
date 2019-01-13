@@ -104,16 +104,17 @@ class Body extends Submit {
     this.$tab = document.getElementById(this.id + '-tab')
     this.$item = document.getElementById(this.id + '-form')
     this.$selectionTabs = this.$item.querySelector('.nav-tabs')
+    this.$formTabs = this.$item.querySelector('.form-tabs')
     this.$children = this.$selectionTabs.children
 
     this.tabs = [
       {
         name: '1',
-        text: ''
+        text: '{action: 1}'
       },
       {
         name: '2',
-        text: ''
+        text: '{action: 2}'
       }
     ]
 
@@ -129,6 +130,7 @@ class Body extends Submit {
     $anchor.classList.add('nav-link', 'body-tab')
     $anchor.setAttribute('href', '#')
     $anchor.innerText = name
+    $anchor.setAttribute('data-name', name)
     $anchor.addEventListener('click', this._selectTab.bind(this))
     this._appendTabs = this._appendTabs.bind(this)
 
@@ -137,10 +139,45 @@ class Body extends Submit {
     return $item
   }
 
+  _bodyPane ({name, text}) {
+    const $pane = document.createElement('div')
+    $pane.id = 'Body-pane-' + name
+    $pane.classList.add('tab-pane', 'fade', 'show', 'active', 'body-pane', 'row')
+    $pane.setAttribute('role', 'tabpanel')
+    $pane.setAttribute('aria-labelledby', 'pills-home-tab')
+    const $textArea = document.createElement('textarea')
+    $textArea.innerText = text
+    $textArea.classList.add('form-control')
+    $textArea.setAttribute('rows', 10)
+    const $submitBtn = document.createElement('button')
+    $submitBtn.innerText = 'Send'
+    $submitBtn.classList.add('btn', 'btn-primary')
+
+    $pane.prepend($textArea)
+    $pane.append($submitBtn)
+
+    return $pane
+  }
+
+  _clearBodyPane () {
+    const $pane = document.getElementsByClassName('body-pane')[0]
+    if ($pane) $pane.remove()
+  }
+
+  _appendBodyPane (name) {
+    const tab = this.tabs.find((t) => t.name === name)
+    if (tab) {
+      this._clearBodyPane()
+      this.$formTabs.append(this._bodyPane(tab))
+    }
+  }
+
   _selectTab (evt) {
     const $a = evt.target
+    const name = $a.getAttribute('data-name')
     this._clearActives()
     $a.classList.add('active')
+    this._appendBodyPane(name)
   }
 
   _plusAnchor () {
@@ -180,15 +217,19 @@ class Body extends Submit {
       this.$selectionTabs.append($tab)
     })
     this._resetPlusAnchor()
+    this._appendBodyPane(this.tabs[this.tabs.length - 1].name)
   }
 
   _appendNewTab () {
-    const newTab = {name: this.tabs.length + 1, test: ''}
+    const name = (this.tabs.length + 1).toString()
+    const newTab = {name, text: '{action: ' + name + '}'}
     this.tabs.push(newTab)
+    console.log(this.tabs)
     const $tab = this._formTab(newTab)
     $tab.querySelector('a').classList.add('active')
     this.$selectionTabs.append($tab)
     this._resetPlusAnchor()
+    this._appendBodyPane(name)
   }
 }
 

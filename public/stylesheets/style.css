@@ -51,6 +51,16 @@
 #Body-form .nav #Json-add a {
   color: #ffffff; }
 
+#Body-form .tab-pane {
+  width: 100%;
+  margin: 0; }
+  #Body-form .tab-pane textarea {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0; }
+  #Body-form .tab-pane .btn {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0; }
+
 html {
   height: 100%; }
 
