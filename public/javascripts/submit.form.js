@@ -103,7 +103,92 @@ class Body extends Submit {
     this.id = 'Body'
     this.$tab = document.getElementById(this.id + '-tab')
     this.$item = document.getElementById(this.id + '-form')
+    this.$selectionTabs = this.$item.querySelector('.nav-tabs')
+    this.$children = this.$selectionTabs.children
+
+    this.tabs = [
+      {
+        name: '1',
+        text: ''
+      },
+      {
+        name: '2',
+        text: ''
+      }
+    ]
+
     this.init()
+    this._appendTabs()
+ }
+
+  _formTab ({name}) {
+    const $item = document.createElement('li')
+    $item.classList.add('nav-item')
+    $item.id = 'submit-form-tab-' + name
+    const $anchor = document.createElement('a')
+    $anchor.classList.add('nav-link', 'body-tab')
+    $anchor.setAttribute('href', '#')
+    $anchor.innerText = name
+    $anchor.addEventListener('click', this._selectTab.bind(this))
+    this._appendTabs = this._appendTabs.bind(this)
+
+    $item.appendChild($anchor)
+
+    return $item
+  }
+
+  _selectTab (evt) {
+    const $a = evt.target
+    this._clearActives()
+    $a.classList.add('active')
+  }
+
+  _plusAnchor () {
+    const $item = document.createElement('li')
+    $item.id = 'Json-add'
+    $item.classList.add('nav-item')
+    const $anchor = document.createElement('a')
+    $anchor.classList.add('nav-link', 'body-tab')
+    $anchor.setAttribute('href', '#')
+    $anchor.innerText = '+'
+    $anchor.addEventListener('click', () => {
+      this._clearActives()
+      this._appendNewTab()
+    })
+
+    $item.append($anchor)
+
+    return $item
+  }
+
+  _clearActives () {
+    this._iterateElements(this.$children, (li) => {
+      li.querySelector('a').classList.remove('active')
+    })
+  }
+
+  _resetPlusAnchor () {
+    const $add = document.getElementById('Json-add')
+    if ($add !== null) $add.remove()
+    this.$selectionTabs.append(this._plusAnchor())
+  }
+
+  _appendTabs () {
+    this.tabs.forEach((tab, ind, coll) => {
+      const $tab = this._formTab(tab)
+      if (ind === coll.length - 1) $tab.querySelector('a').classList.add('active')
+      this.$selectionTabs.append($tab)
+    })
+    this._resetPlusAnchor()
+  }
+
+  _appendNewTab () {
+    const newTab = {name: this.tabs.length + 1, test: ''}
+    this.tabs.push(newTab)
+    const $tab = this._formTab(newTab)
+    $tab.querySelector('a').classList.add('active')
+    this.$selectionTabs.append($tab)
+    this._resetPlusAnchor()
   }
 }
 
