@@ -1,8 +1,8 @@
 const chai = require('chai')
 const {expect} = chai
 const chaiHttp = require('chai-http')
-const app = require('../app')
-const {userDAO} = require('../daos')
+const app = require('../server/app')
+const {userDAO} = require('../server/daos')
 const jwt = require('jsonwebtoken')
 const should = chai.should()
 chai.use(chaiHttp)
