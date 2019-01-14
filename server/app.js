@@ -34,16 +34,13 @@ app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 
+// routes
+app.use(router)
+
 // serve ui
 app.use(express.static(path.join(__dirname, '../ui_dist')))
 app.use('/', function (res) {
   res.sendFile('../ui_dist/index.html')
-})
-
-// routes
-app.use(router)
-app.use('*', function (req, res) {
-  res.redirect(url.parse(req.url).pathname)
 })
 
 // catch 404 and forward to error handler
