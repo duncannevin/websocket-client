@@ -34,18 +34,20 @@ app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 
+// serve ui
+app.use(express.static(path.join(__dirname, '../public')))
+
 // routes
 app.use(router)
-
-// serve ui
-app.use(express.static(path.join(__dirname, '../ui_dist')))
-app.use('/', function (res) {
-  res.sendFile('../ui_dist/index.html')
-})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404))
+})
+
+// Server index.html page when request to the root is made
+app.use('/', function (req, res, next) {
+  res.sendfile('../public/index.html')
 })
 
 // error handler
@@ -55,8 +57,8 @@ app.use(function (err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {}
 
   // render the error page
-  res.status(err.status || 500)
-  res.render('error')
+  const status = err.status || 500
+  res.status(status).send({code: status, msg: err.message})
 })
 
 module.exports = app
