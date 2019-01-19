@@ -5,12 +5,12 @@
       <b-tab
         v-for="(tab, ind) in bodies"
         :key="'bodies-tab-' + ind"
-        :title="tab.name"
+        :title="'REQ:' + tab.name"
         :active="activeTab === ind"
         @click="activeTab = ind"
       >
-        <b-row>
-          <b-col cols="10" style="padding-right: 0;">
+        <b-row class="section">
+          <b-col cols="8" style="padding-right: 0;">
             <ace-editor
               v-model="tab.content"
               @init="editorInit"
@@ -20,16 +20,9 @@
               width="100%"
             ></ace-editor>
           </b-col>
-          <b-col cols="2" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <b-button-group vertical style="width: 100%;">
-              <b-dropdown right split :text="theme.toUpperCase()">
-                <b-dropdown-item
-                  v-for="themeOpt in themes"
-                  :key="themeOpt"
-                  @click="theme = themeOpt"
-                >{{themeOpt.toUpperCase()}}</b-dropdown-item>
-              </b-dropdown>
-              <b-dropdown right split :text="tab.lang.toUpperCase()">
+          <b-col cols="3" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <b-button-group vertical>
+              <b-dropdown right :text="tab.lang.toUpperCase()">
                 <b-dropdown-item
                   v-for="langOpt in langs"
                   :key="langOpt"
@@ -37,7 +30,7 @@
                 >{{langOpt.toUpperCase()}}</b-dropdown-item>
               </b-dropdown>
             </b-button-group>
-            <b-button-group style="width: 100%;">
+            <b-button-group>
               <b-button variant="success">Send</b-button>
             </b-button-group>
           </b-col>

@@ -40,7 +40,8 @@
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "vue2-ace-editor": "0.0.13",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "xml-formatter": "^1.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

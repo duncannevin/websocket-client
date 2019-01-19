@@ -48,7 +48,7 @@ export default {
   name: 'Headers',
   data () {
     return {
-      newHeader: {key: 'value'}
+      newHeader: {key: 'key', value: 'value'}
     }
   },
   props: ['headers']
