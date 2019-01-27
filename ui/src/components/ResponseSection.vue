@@ -69,6 +69,7 @@ export default {
       editor.renderer.setStyle('disabled', true)
       editor.renderer.$cursorLayer.element.style.display = 'none'
       editor.setOption('highlightActiveLine', false)
+      editor.setShowPrintMargin(false)
     },
     formatData () {
       return this.responseData.responses.map((rd) => {

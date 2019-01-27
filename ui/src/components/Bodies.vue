@@ -70,7 +70,7 @@ export default {
     }
   },
   methods: {
-    editorInit () {
+    editorInit (editor) {
       require('brace/ext/language_tools')
       require('brace/mode/xml')
       require('brace/mode/json')
@@ -78,6 +78,7 @@ export default {
       require('brace/theme/monokai')
       require('brace/theme/chrome')
       require('brace/snippets/javascript')
+      editor.setShowPrintMargin(false)
     },
     newBody () {
       console.log('NEW BODY')

@@ -10,7 +10,7 @@
       @click="selectConnection"
     >
       <template slot="title">
-        <span class="tab-name">{{connection.name}}</span>
+        <span class="tab-name" @dblclick="renameConnection($event, ind)">{{connection.name}}</span>
         <span class="delete-button" @click="deleteConnection(ind)">&#215;</span>
       </template>
       <connection
@@ -53,6 +53,9 @@ export default {
     },
     deleteConnection (ind) {
       this.connections.tabs.splice(ind, 1)
+    },
+    renameConnection (evt, ind) {
+      console.log('RENAME CONNECTION', ind)
     }
   },
   components: {
