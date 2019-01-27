@@ -1,16 +1,21 @@
 <template>
 <b-row class="section">
   <b-col>
-    <b-tabs>
+    <b-tabs
+      :no-key-nav="true"
+    >
       <b-tab
         v-for="(tab, ind) in bodies"
         :key="'bodies-tab-' + ind"
-        :title="'REQ:' + tab.name"
         :active="activeTab === ind"
         @click="activeTab = ind"
       >
+        <template slot="title">
+          <span class="tab-name">{{tab.name}}</span>
+          <span class="delete-button" @click="deleteBody(ind)">&#215;</span>
+        </template>
         <b-row class="section">
-          <b-col cols="8" style="padding-right: 0;">
+          <b-col cols="8">
             <ace-editor
               v-model="tab.content"
               @init="editorInit"
@@ -20,7 +25,7 @@
               width="100%"
             ></ace-editor>
           </b-col>
-          <b-col cols="3" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <b-col cols="4" class="control-buttons">
             <b-button-group vertical>
               <b-dropdown right :text="tab.lang.toUpperCase()">
                 <b-dropdown-item
@@ -30,7 +35,7 @@
                 >{{langOpt.toUpperCase()}}</b-dropdown-item>
               </b-dropdown>
             </b-button-group>
-            <b-button-group>
+            <b-button-group vertical>
               <b-button variant="success">Send</b-button>
             </b-button-group>
           </b-col>
@@ -40,9 +45,13 @@
           </b-col>
         </b-row>
       </b-tab>
-      <b-tab
-        title="+"
-      ></b-tab>
+      <b-nav-item slot="tabs" @click.prevent="newBody" href="#">
+        +
+      </b-nav-item>
+      <div slot="empty" class="text-center text-muted">
+        No bodies yet...
+        <br> Open a new tab using + button.
+      </div>
     </b-tabs>
   </b-col>
 </b-row>
@@ -69,6 +78,12 @@ export default {
       require('brace/theme/monokai')
       require('brace/theme/chrome')
       require('brace/snippets/javascript')
+    },
+    newBody () {
+      console.log('NEW BODY')
+    },
+    deleteBody (ind) {
+      this.bodies.splice(ind, 1)
     }
   },
   components: {

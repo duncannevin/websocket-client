@@ -1,24 +1,40 @@
 <template>
 <b-row class="section">
   <b-col>
-    <b-tabs>
+    <b-tabs
+      :no-key-nav="true"
+    >
       <b-tab
         v-for="(tab, ind) in responseData.responses"
         :key="'response-tab-' + ind"
         :title="'RES:' + tab.bodyName"
-        :active="activeTab === ind"
         @click="activeTab = ind"
       >
-        <b-row>
-          <b-col cols="12">
+        <template slot="title">
+          <span class="tab-name">{{tab.bodyName}}</span>
+          <span class="delete-button" @click="deleteResponse(ind)">&#215;</span>
+        </template>
+        <b-row class="section">
+          <b-col cols="8" class="response-editor">
             <ace-editor
               v-model="tab.content"
               @init="editorInit"
               :theme="theme"
               :lang="tab.lang"
-              height="800px"
+              height="400px"
               width="100%"
             ></ace-editor>
+          </b-col>
+          <b-col cols="4" class="control-buttons">
+            <b-button-group vertical>
+              <b-dropdown right :text="tab.lang.toUpperCase()">
+                <b-dropdown-item
+                  v-for="langOpt in langs"
+                  :key="langOpt"
+                  @click="tab.lang = langOpt"
+                >{{langOpt.toUpperCase()}}</b-dropdown-item>
+              </b-dropdown>
+            </b-button-group>
           </b-col>
         </b-row>
       </b-tab>
@@ -36,7 +52,8 @@ export default {
     this.formatData()
     return {
       activeTab: 0,
-      theme: 'monokai'
+      theme: 'monokai',
+      langs: ['json', 'xml', 'plain_text']
     }
   },
   methods: {
@@ -50,6 +67,8 @@ export default {
       require('brace/snippets/javascript')
       editor.container.style.pointerEvents = 'none'
       editor.renderer.setStyle('disabled', true)
+      editor.renderer.$cursorLayer.element.style.display = 'none'
+      editor.setOption('highlightActiveLine', false)
     },
     formatData () {
       return this.responseData.responses.map((rd) => {
@@ -65,6 +84,9 @@ export default {
       } catch (_) {
         return json
       }
+    },
+    deleteResponse (ind) {
+      this.responseData.responses.splice(ind, 1)
     }
   },
   components: {
@@ -74,6 +96,7 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="sass">
+.response-editor:hover
+  cursor: not-allowed
 </style>

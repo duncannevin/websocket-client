@@ -32,8 +32,28 @@ body
   display: flex
   justify-content: center
   margin: 1rem 0
+  div
+    padding: 0
+  .control-buttons
+    display: flex
+    flex-direction: column
+    justify-content: space-between
 .col
   padding: 0
 .form-control:disabled
   opacity: 0.8
+.nav-tabs
+  border-bottom: none
+  .nav-item
+    .nav-link
+      color: $white
+      background-color: transparent
+      border: none
+      padding: 0
+      margin-right: 1rem
+    .delete-button
+      color: $red
+    .nav-link.active
+      color: $green
+      border-bottom: 3px solid $green
 </style>
