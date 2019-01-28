@@ -1,9 +1,22 @@
 const mongoose = require('mongoose')
 const crypto = require('crypto')
-const userModel = require('../models/user.model')
-const {jwtGen} = require('../utils')
+const { jwtGen } = require('../utils')
 
-const UserSchema = new mongoose.Schema(userModel)
+const UserSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      trim: true,
+      index: true,
+      sparse: true,
+      unique: true
+    },
+    method: String,
+    hash: String,
+    salt: String,
+    role: String
+  }
+)
 
 UserSchema.methods.setPassword = function (password) {
   this.salt = crypto.randomBytes(16).toString('hex')

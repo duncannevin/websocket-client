@@ -12,7 +12,7 @@
       >
         <template slot="title">
           <span class="tab-name">{{tab.name}}</span>
-          <span class="delete-button" @click="deleteBody(ind)">&#215;</span>
+          <span v-if="authenticated" class="delete-button" @click="deleteBody(ind)">&#215;</span>
         </template>
         <b-row class="section">
           <b-col cols="8">
@@ -36,7 +36,7 @@
               </b-dropdown>
             </b-button-group>
             <b-button-group vertical>
-              <b-button variant="success">Send</b-button>
+              <b-button variant="success" :disabled="!ws.connected" @click="ws.send(tab)">Send</b-button>
             </b-button-group>
           </b-col>
         </b-row>
@@ -90,7 +90,7 @@ export default {
   components: {
     AceEditor
   },
-  props: ['bodies']
+  props: ['bodies', 'ws', 'authenticated']
 }
 </script>
 

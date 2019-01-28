@@ -4,19 +4,18 @@
     :no-key-nav="true"
   >
     <b-tab
-      v-for="(connection, ind) in connections.tabs"
+      v-for="(connection, ind) in connections"
       :key="'connection-tab-' + ind"
       :active="openTab === ind"
       @click="selectConnection"
     >
       <template slot="title">
         <span class="tab-name" @dblclick="renameConnection($event, ind)">{{connection.name}}</span>
-        <span class="delete-button" @click="deleteConnection(ind)">&#215;</span>
+        <span v-if="authenticated" class="delete-button" @click="deleteConnection(ind)">&#215;</span>
       </template>
       <connection
-        :url-data="connection.urlData"
-        :request-data="connection.requestData"
-        :response-data="connection.responseData"
+        :connection="connection"
+        :authentcated="authenticated"
       ></connection>
     </b-tab>
     <b-nav-item slot="tabs" @click.prevent="newConnection" href="#">
@@ -37,6 +36,9 @@ export default {
   computed: {
     connections () {
       return this.$store.getters.getConnections
+    },
+    authenticated () {
+      return this.$store.getters.getAuthenticated
     }
   },
   data () {

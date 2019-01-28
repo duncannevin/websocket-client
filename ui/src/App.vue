@@ -42,6 +42,8 @@ body
   padding: 0
 .form-control:disabled
   opacity: 0.8
+.disabled:hover
+  cursor: not-allowed
 .nav-tabs
   border-bottom: none
   .nav-item

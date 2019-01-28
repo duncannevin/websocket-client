@@ -1,7 +1,16 @@
 const mongoose = require('mongoose')
-const urlDataModel = require('../models/url_data.model')
 
-const UrlDataModel = new mongoose.Schema(urlDataModel)
+const UrlDataModel = new mongoose.Schema(
+  {
+    userId: String,
+    connected: Boolean,
+    url: String,
+    connectionName: {
+      type: String,
+      unique: String
+    }
+  }
+)
 
 const UrlDataRepository = mongoose.model('url_data', UrlDataModel)
 module.exports = UrlDataRepository

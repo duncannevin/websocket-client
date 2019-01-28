@@ -9,9 +9,9 @@
         :active="activeTab === ind"
         @click="activeTab = ind"
       >
-        <bodies v-if="tab[0] === 'bodies'" :bodies="tab[1]"></bodies>
-        <cookies v-if="tab[0] === 'cookies'" :cookies="tab[1]"></cookies>
-        <headers v-if="tab[0] === 'headers'" :headers="tab[1]"></headers>
+        <bodies v-if="tab[0] === 'bodies'" :ws="connection.ws" :bodies="tab[1]" :authenticated="authenticated"></bodies>
+        <cookies v-if="tab[0] === 'cookies'" :cookies="tab[1]" :authenticated="authenticated"></cookies>
+        <headers v-if="tab[0] === 'headers'" :headers="tab[1]" :authenticated="authenticated"></headers>
       </b-tab>
     </b-tabs>
   </b-col>
@@ -26,11 +26,7 @@ export default {
   name: 'RequestSection',
   computed: {
     dataInOrder () {
-      return Object.keys(this.requestData)
-        .sort()
-        .map((key) => {
-          return [key, this.requestData[key]]
-        })
+      return [['bodies', this.connection.bodies], ['cookies', this.connection.cookies], ['headers', this.connection.headers]]
     }
   },
   data () {
@@ -43,7 +39,7 @@ export default {
     Cookies,
     Headers
   },
-  props: ['requestData']
+  props: ['connection', 'authenticated']
 }
 </script>
 

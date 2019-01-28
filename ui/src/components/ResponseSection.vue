@@ -5,36 +5,28 @@
       :no-key-nav="true"
     >
       <b-tab
-        v-for="(tab, ind) in responseData.responses"
+        v-for="(tab, ind) in responses"
         :key="'response-tab-' + ind"
-        :title="'RES:' + tab.bodyName"
         @click="activeTab = ind"
       >
         <template slot="title">
           <span class="tab-name">{{tab.bodyName}}</span>
-          <span class="delete-button" @click="deleteResponse(ind)">&#215;</span>
         </template>
         <b-row class="section">
-          <b-col cols="8" class="response-editor">
+          <b-col
+            v-for="(res, ind) in tab.contents"
+            :key="'response-content-' + ind"
+            cols="12"
+            class="response-editor"
+          >
             <ace-editor
-              v-model="tab.content"
+              v-model="res.content"
               @init="editorInit"
               :theme="theme"
-              :lang="tab.lang"
-              height="400px"
+              :lang="res.lang"
+              height="200px"
               width="100%"
             ></ace-editor>
-          </b-col>
-          <b-col cols="4" class="control-buttons">
-            <b-button-group vertical>
-              <b-dropdown right :text="tab.lang.toUpperCase()">
-                <b-dropdown-item
-                  v-for="langOpt in langs"
-                  :key="langOpt"
-                  @click="tab.lang = langOpt"
-                >{{langOpt.toUpperCase()}}</b-dropdown-item>
-              </b-dropdown>
-            </b-button-group>
           </b-col>
         </b-row>
       </b-tab>
@@ -45,11 +37,9 @@
 
 <script>
 import AceEditor from 'vue2-ace-editor'
-import xmlFormat from 'xml-formatter'
 export default {
   name: 'ResponseSection',
   data () {
-    this.formatData()
     return {
       activeTab: 0,
       theme: 'monokai',
@@ -70,34 +60,19 @@ export default {
       editor.renderer.$cursorLayer.element.style.display = 'none'
       editor.setOption('highlightActiveLine', false)
       editor.setShowPrintMargin(false)
-    },
-    formatData () {
-      return this.responseData.responses.map((rd) => {
-        const formattedContent = rd.lang === 'json'
-          ? this.prettyPrintJSON(rd.content) : rd.lang === 'xml'
-            ? xmlFormat(rd.content) : rd.content
-        return Object.assign(rd, {content: formattedContent})
-      })
-    },
-    prettyPrintJSON (json) {
-      try {
-        return JSON.stringify(JSON.parse(json), null, '\t')
-      } catch (_) {
-        return json
-      }
-    },
-    deleteResponse (ind) {
-      this.responseData.responses.splice(ind, 1)
     }
   },
   components: {
     AceEditor
   },
-  props: ['responseData']
+  props: ['responses', 'authenticated']
 }
 </script>
 
 <style scoped lang="sass">
+@import "../styles/custom-bootstrap"
+.response-editor
+  border-bottom: 3px solid $green
 .response-editor:hover
   cursor: not-allowed
 </style>

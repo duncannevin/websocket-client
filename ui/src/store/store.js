@@ -1,93 +1,71 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
+import Ws from '../services/Ws'
+import xmlFormat from 'xml-formatter'
 
 Vue.use(Vuex)
 
+function prettyPrintJSON (json) {
+  try {
+    return JSON.stringify(JSON.parse(json), null, '\t')
+  } catch (_) {
+    return json
+  }
+}
+
+function formatResponse ({lang, content}) {
+  const formattedContent = lang === 'json'
+    ? prettyPrintJSON(content) : lang === 'xml'
+      ? xmlFormat(content) : content
+  return {lang, content: formattedContent}
+}
+
 export default new Vuex.Store({
   state: {
-    connections: {
-      tabs: [
-        {
-          name: 'connection-1',
-          urlData: {
-            connected: false,
-            url: 'wss://echo.websocket.org'
-          },
-          requestData: {
-            cookies: [
-              {bKey: 'bValue'}
-            ],
-            headers: [
-              {hKey: 'hValue'}
-            ],
-            bodies: [
-              {
-                name: 'to-the-moon',
-                lang: 'json',
-                content: '{' +
-                  '"have": "fun", ' +
-                  '"be": "happy"' +
-                  '}'
-              },
-              {
-                name: 'to-the-sun',
-                lang: 'xml',
-                content: '<note>\n' +
-                  '<to>Tove</to>\n' +
-                  '<from>Jani</from>\n' +
-                  '<heading>Reminder</heading>\n' +
-                  '<body>Don\'t forget me this weekend!</body>\n' +
-                  '</note>'
-              },
-              {
-                name: 'to-the-nothing',
-                lang: 'plain_text',
-                content: 'This is very plain'
-              }
-            ]
-          },
-          responseData: {
-            responses: [
-              {
-                bodyName: 'to-the-moon',
-                lang: 'json',
-                content: '{"what": "a", "crazy": "ride", "onThe": 1234}'
-              },
-              {
-                bodyName: 'to-the-sun',
-                lang: 'xml',
-                content: '<response><from>Jim</from><body>You bet ya!</body></response>'
-              },
-              {
-                bodyName: 'to-the-nothing',
-                lang: 'plain_text',
-                content: 'No its not'
-              }
-            ]
+    connections: [
+      {
+        name: 'default',
+        url: 'wss://echo.websocket.org',
+        ws: new Ws('default', 'wss://echo.websocket.org'),
+        cookies: [],
+        headers: [],
+        bodies: [
+          {
+            name: 'default-body',
+            lang: 'json',
+            content: '{"websockets": "rock!"}'
           }
-        },
-        {
-          name: 'connection-2',
-          urlData: {
-            connected: false,
-            url: 'ws://localhost:9000/ws'
-          },
-          requestData: {
-            cookies: [],
-            headers: [],
-            bodies: []
-          },
-          responseData: {
-            bodyId: '',
-            responses: []
+        ],
+        responses: [
+          { // anytime a body is added, add this
+            bodyName: 'default-body',
+            lang: 'json',
+            contents: []
           }
-        }
-      ]
+        ]
+      }
+    ],
+    authenticated: false
+  },
+  mutations: {
+    PUSH_RESPONSE (state, {connectionName, name, lang, content}) {
+      const connection = state.connections.find((c) => c.name === connectionName)
+      const response = connection.responses.find((r) => r.bodyName === name)
+      if (connection && response) {
+        response.contents.unshift(formatResponse({lang, content}))
+      }
     }
   },
-  mutations: {},
-  actions: {},
+  actions: {
+    pushResponse ({ commit }, args) {
+      commit('PUSH_RESPONSE', args)
+    },
+    openSocket ({ commit }, args) {
+      commit('OPEN_SOCKET', args)
+    }
+  },
   getters: {
-    getConnections: state => state.connections
+    getConnections: state => state.connections,
+    getAuthenticated: state => state.authenticated
   }
 })

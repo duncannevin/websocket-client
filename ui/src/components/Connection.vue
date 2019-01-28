@@ -1,23 +1,31 @@
 <template>
 <div class="container connection">
-  <url-section :url-data="urlData"></url-section>
-  <request-section :request-data="requestData"></request-section>
-  <response-section :response-data="responseData"></response-section>
+  <b-row class="section">
+    <b-col lg="8">
+      <b-input-group prepend="Location">
+        <b-form-input :value="connection.url"></b-form-input>
+        <b-input-group-append>
+          <b-btn v-if="!connection.ws.connected" variant="success" @click="connection.ws.openSocket">Connect</b-btn>
+          <b-btn v-else variant="warning" @click="connection.ws.closeSocket">Disconnect</b-btn>
+        </b-input-group-append>
+      </b-input-group>
+    </b-col>
+  </b-row>
+  <request-section :connection="connection" :connection-name="connection.name" :authenticated="authenticated"></request-section>
+  <response-section :responses="connection.responses" :authenticated="authenticated"></response-section>
 </div>
 </template>
 
 <script>
-import UrlSection from './UrlSection'
 import RequestSection from './RequestSection'
 import ResponseSection from './ResponseSection'
 export default {
   name: 'Connection',
   components: {
-    UrlSection,
     RequestSection,
     ResponseSection
   },
-  props: ['urlData', 'requestData', 'responseData']
+  props: ['connection', 'authenticated']
 }
 </script>
 
