@@ -1,5 +1,5 @@
 <template>
-<div id="Connections" class="container">
+<div id="Connections" class="col-9">
   <b-tabs
     :no-key-nav="true"
   >
@@ -67,5 +67,6 @@ export default {
 </script>
 
 <style scoped lang="sass">
-
+#Connections
+  margin: 0 auto
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="container-fluid">
+  <div id="app" class="container">
     <navbar></navbar>
     <router-view/>
   </div>
@@ -30,7 +30,6 @@ body
   padding-right: 0
 .section
   display: flex
-  justify-content: center
   margin: 1rem 0
   div
     padding: 0
@@ -44,6 +43,8 @@ body
   opacity: 0.8
 .disabled:hover
   cursor: not-allowed
+.delete-button
+  color: $red
 .nav-tabs
   border-bottom: none
   .nav-item
@@ -53,9 +54,37 @@ body
       border: none
       padding: 0
       margin-right: 1rem
-    .delete-button
-      color: $red
     .nav-link.active
       color: $green
       border-bottom: 3px solid $green
+.section-controls
+  position: absolute
+  top: 0
+  right: 0
+  .show > .btn-secondary.dropdown-toggle
+    background-color: transparent
+    border: none
+  .btn
+    font-size: 1rem
+    font-weight: bold
+    padding: 0 0 0 1rem
+    height: min-content
+    background-color: transparent
+    border: none
+  .btn:focus
+    box-shadow: none
+.animated
+  animation-duration: 1s
+  animation-fill-mode: both
+
+@keyframes zoomIn
+  from
+    opacity: 0
+    transform: scale3d(0.3, 0.3, 0.3)
+
+  50%
+    opacity: 1
+
+.zoomIn
+  animation-name: zoomIn
 </style>

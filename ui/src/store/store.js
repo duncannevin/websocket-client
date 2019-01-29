@@ -25,8 +25,8 @@ export default new Vuex.Store({
     connections: [
       {
         name: 'default',
-        url: 'wss://echo.websocket.org',
-        ws: new Ws('default', 'wss://echo.websocket.org'),
+        url: 'ws://echo.websocket.org',
+        ws: new Ws('default', 'ws://echo.websocket.org'),
         cookies: [],
         headers: [],
         bodies: [
@@ -52,7 +52,7 @@ export default new Vuex.Store({
       const connection = state.connections.find((c) => c.name === connectionName)
       const response = connection.responses.find((r) => r.bodyName === name)
       if (connection && response) {
-        response.contents.unshift(formatResponse({lang, content}))
+        response.contents.unshift(formatResponse({ lang, content }))
       }
     }
   },

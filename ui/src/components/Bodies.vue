@@ -15,7 +15,7 @@
           <span v-if="authenticated" class="delete-button" @click="deleteBody(ind)">&#215;</span>
         </template>
         <b-row class="section">
-          <b-col cols="8">
+          <b-col cols="12">
             <ace-editor
               v-model="tab.content"
               @init="editorInit"
@@ -24,9 +24,7 @@
               height="200px"
               width="100%"
             ></ace-editor>
-          </b-col>
-          <b-col cols="4" class="control-buttons">
-            <b-button-group vertical>
+            <b-button-group class="section-controls" size="sm">
               <b-dropdown right :text="tab.lang.toUpperCase()">
                 <b-dropdown-item
                   v-for="langOpt in langs"
@@ -34,9 +32,7 @@
                   @click="tab.lang = langOpt"
                 >{{langOpt.toUpperCase()}}</b-dropdown-item>
               </b-dropdown>
-            </b-button-group>
-            <b-button-group vertical>
-              <b-button variant="success" :disabled="!ws.connected" @click="ws.send(tab)">Send</b-button>
+              <b-button class="send-btn" variant="success" :disabled="!ws.connected" @click="ws.send(tab)">Send</b-button>
             </b-button-group>
           </b-col>
         </b-row>
@@ -79,6 +75,7 @@ export default {
       require('brace/theme/chrome')
       require('brace/snippets/javascript')
       editor.setShowPrintMargin(false)
+      editor.setOption('highlightActiveLine', false)
     },
     newBody () {
       console.log('NEW BODY')
@@ -94,6 +91,5 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="sass">
 </style>

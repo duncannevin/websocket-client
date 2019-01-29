@@ -1,6 +1,6 @@
 <template>
 <div class="container connection">
-  <b-row class="section">
+  <b-row class="section url-bar">
     <b-col lg="8">
       <b-input-group prepend="Location">
         <b-form-input :value="connection.url"></b-form-input>
@@ -30,5 +30,6 @@ export default {
 </script>
 
 <style scoped lang="sass">
-
+.url-bar
+  justify-content: center
 </style>
