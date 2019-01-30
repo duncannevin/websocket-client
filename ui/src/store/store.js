@@ -13,11 +13,10 @@ function prettyPrintJSON (json) {
   }
 }
 
-function formatResponse ({lang, content}) {
-  const formattedContent = lang === 'json'
-    ? prettyPrintJSON(content) : lang === 'xml'
-      ? xmlFormat(content) : content
-  return {lang, content: formattedContent}
+function formatResponse ({lang, wsResponse}) {
+  return lang === 'json'
+    ? prettyPrintJSON(wsResponse) : lang === 'xml'
+      ? xmlFormat(wsResponse) : wsResponse
 }
 
 export default new Vuex.Store({
@@ -48,11 +47,11 @@ export default new Vuex.Store({
     authenticated: false
   },
   mutations: {
-    PUSH_RESPONSE (state, {connectionName, name, lang, content}) {
+    PUSH_RESPONSE (state, {connectionName, name, lang, wsSent, wsResponse}) {
       const connection = state.connections.find((c) => c.name === connectionName)
       const response = connection.responses.find((r) => r.bodyName === name)
       if (connection && response) {
-        response.contents.unshift(formatResponse({ lang, content }))
+        response.contents.unshift({lang, wsSent, wsResponse: formatResponse({lang, wsResponse})})
       }
     }
   },

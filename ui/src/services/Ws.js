@@ -30,7 +30,8 @@ class Ws {
     this._ws.onmessage = ({data}) => {
       $store.dispatch('pushResponse', Object.assign(this._lastBody, {
         connectionName: this.name,
-        content: data
+        wsSent: Object.assign({}, this._lastBody),
+        wsResponse: data
       }))
     }
   }

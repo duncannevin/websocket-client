@@ -14,7 +14,7 @@
           <span class="tab-name">{{tab.name}}</span>
           <span v-if="authenticated" class="delete-button" @click="deleteBody(ind)">&#215;</span>
         </template>
-        <b-row class="section">
+        <b-row>
           <b-col cols="12">
             <ace-editor
               v-model="tab.content"

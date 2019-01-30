@@ -39,6 +39,11 @@ body
     justify-content: space-between
 .col
   padding: 0
+.row
+  margin-right: 0
+  margin-left: 0
+.ace_scrollbar
+  display: none
 .form-control:disabled
   opacity: 0.8
 .disabled:hover

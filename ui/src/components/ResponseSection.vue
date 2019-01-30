@@ -5,40 +5,51 @@
       :no-key-nav="true"
     >
       <b-tab
-        v-for="(tab, rInd) in responses"
+        v-for="(response, rInd) in responses"
         :key="'response-tab-' + rInd"
         @click="activeTab = rInd"
       >
         <template slot="title">
-          <span class="tab-name">{{tab.bodyName}}</span>
+          <span class="tab-name">{{response.bodyName}}</span>
         </template>
-          <transition-group name="list" tag="div">
-            <b-col
-              v-for="(res, cInd) in tab.contents"
-              :key="'response-content-' + cInd"
-              cols="12"
-              class="response-editor"
-            >
+          <b-row
+            v-for="(content, cInd) in response.contents"
+            :key="'response-content-' + cInd"
+            class="response-editor"
+          >
+            <div class="response-display ws-sent-display">
               <ace-editor
-                v-model="res.content"
+                :value="content.wsSent.content"
                 @init="editorInit"
                 :theme="theme"
-                :lang="res.lang"
-                height="200px"
+                :lang="content.wsSent.lang"
+                height="100%"
                 width="100%"
               ></ace-editor>
+              <span class="response-display-title">Sent</span>
+            </div>
+            <div class="response-display ws-response-display">
+              <ace-editor
+                v-model="content.wsResponse"
+                @init="editorInit"
+                :theme="theme"
+                :lang="content.lang"
+                height="100%"
+                width="100%"
+              ></ace-editor>
+              <span class="response-display-title">Response</span>
               <b-button-group class="section-controls" size="sm">
-                <b-dropdown right :text="res.lang.toUpperCase()">
+                <b-dropdown right :text="content.lang.toUpperCase()">
                   <b-dropdown-item
                     v-for="(lang, ind) in langs"
                     :key="'response-lang-' + ind"
-                    @click="changeLang(lang, tab.contents[cInd])"
+                    @click="changeLang(lang, response.contents[cInd])"
                   >{{lang.toUpperCase()}}</b-dropdown-item>
                 </b-dropdown>
-                <b-button class="delete-button" @click="deleteResponse(cInd, tab.contents)">&#215;</b-button>
+                <b-button class="delete-button" @click="deleteResponse(cInd, response.contents)">&#215;</b-button>
               </b-button-group>
-            </b-col>
-          </transition-group>
+            </div>
+          </b-row>
       </b-tab>
     </b-tabs>
   </b-col>
@@ -90,6 +101,38 @@ export default {
 .response-editor
   border-bottom: 3px solid $green
   position: relative
+  overflow: hidden
+  &:first-child .response-display
+    height: 200px
+  .response-display
+    position: relative
+    resize: vertical
+    overflow: auto
+    height: 100px
+    .response-display-title
+      position: absolute
+      bottom: 0
+      left: 24px
+      color: $green
+    .response-display-expand
+      position: absolute
+      color: $white
+      font-size: 1.2rem
+      bottom: 10px
+      right: 0
+      &:hover
+        cursor: grab
+      &:active
+        cursor: grabbing
+  .ws-sent-display, .ws-response-display
+    display: inline
+    float: left
+  .ws-sent-display
+    width: 35%
+    max-width: 35%
+  .ws-response-display
+    width: 65%
+    max-width: 65%
   &:hover
     cursor: not-allowed
 .delete-button
