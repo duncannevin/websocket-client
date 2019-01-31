@@ -27,6 +27,9 @@
                 width="100%"
               ></ace-editor>
               <span class="response-display-title">Sent</span>
+              <span class="response-display-expand">
+                <font-awesome-icon icon="arrow-alt-circle-down" />
+              </span>
             </div>
             <div class="response-display ws-response-display">
               <ace-editor
@@ -38,6 +41,9 @@
                 width="100%"
               ></ace-editor>
               <span class="response-display-title">Response</span>
+              <span class="response-display-expand">
+                <font-awesome-icon icon="arrow-alt-circle-down" />
+              </span>
               <b-button-group class="section-controls" size="sm">
                 <b-dropdown right :text="content.lang.toUpperCase()">
                   <b-dropdown-item
@@ -107,8 +113,8 @@ export default {
   .response-display
     position: relative
     resize: vertical
-    overflow: auto
-    height: 100px
+    min-height: 75px
+    overflow: hidden
     .response-display-title
       position: absolute
       bottom: 0
@@ -116,14 +122,11 @@ export default {
       color: $green
     .response-display-expand
       position: absolute
-      color: $white
-      font-size: 1.2rem
-      bottom: 10px
+      bottom: 0
       right: 0
-      &:hover
-        cursor: grab
-      &:active
-        cursor: grabbing
+      color: $green
+      pointer-events: none
+      z-index: 2
   .ws-sent-display, .ws-response-display
     display: inline
     float: left
