@@ -36,6 +36,10 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
+      // bind version of jquery-ui
+      'jquery-ui': 'jquery-ui/jquery-ui.js',
+      // bind to modules;
+      modules: path.join(__dirname, 'node_modules')
     }
   },
   module: {

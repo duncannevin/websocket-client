@@ -17,43 +17,39 @@
             :key="'response-content-' + cInd"
             class="response-editor"
           >
-            <div class="response-display ws-sent-display">
-              <ace-editor
-                :value="content.wsSent.content"
-                @init="editorInit"
-                :theme="theme"
-                :lang="content.wsSent.lang"
-                height="100%"
-                width="100%"
-              ></ace-editor>
-              <span class="response-display-title">Sent</span>
-              <span class="response-display-expand">
-                <font-awesome-icon icon="arrow-alt-circle-down" />
-              </span>
-            </div>
-            <div class="response-display ws-response-display">
-              <ace-editor
-                v-model="content.wsResponse"
-                @init="editorInit"
-                :theme="theme"
-                :lang="content.lang"
-                height="100%"
-                width="100%"
-              ></ace-editor>
-              <span class="response-display-title">Response</span>
-              <span class="response-display-expand">
-                <font-awesome-icon icon="arrow-alt-circle-down" />
-              </span>
-              <b-button-group class="section-controls" size="sm">
-                <b-dropdown right :text="content.lang.toUpperCase()">
-                  <b-dropdown-item
-                    v-for="(lang, ind) in langs"
-                    :key="'response-lang-' + ind"
-                    @click="changeLang(lang, response.contents[cInd])"
-                  >{{lang.toUpperCase()}}</b-dropdown-item>
-                </b-dropdown>
-                <b-button class="delete-button" @click="deleteResponse(cInd, response.contents)">&#215;</b-button>
-              </b-button-group>
+            <div class="display">
+              <div class="ws-sent-display">
+                <ace-editor
+                  :value="content.wsSent.content"
+                  @init="editorInit"
+                  :theme="theme"
+                  :lang="content.wsSent.lang"
+                  height="100%"
+                  width="100%"
+                ></ace-editor>
+                <span class="display-title">Sent</span>
+              </div>
+              <div class="ws-response-display">
+                <ace-editor
+                  v-model="content.wsResponse"
+                  @init="editorInit"
+                  :theme="theme"
+                  :lang="content.lang"
+                  height="100%"
+                  width="100%"
+                ></ace-editor>
+                <span class="display-title">Response</span>
+                <b-button-group class="section-controls" size="sm">
+                  <b-dropdown right :text="content.lang.toUpperCase()">
+                    <b-dropdown-item
+                      v-for="(lang, ind) in langs"
+                      :key="'response-lang-' + ind"
+                      @click="changeLang(lang, response.contents[cInd])"
+                    >{{lang.toUpperCase()}}</b-dropdown-item>
+                  </b-dropdown>
+                  <b-button class="delete-button" @click="deleteResponse(cInd, response.contents)">&#215;</b-button>
+                </b-button-group>
+              </div>
             </div>
           </b-row>
       </b-tab>
@@ -105,30 +101,14 @@ export default {
 <style scoped lang="sass">
 @import "../styles/custom-bootstrap"
 .response-editor
-  border-bottom: 3px solid $green
   position: relative
   overflow: hidden
-  &:first-child .response-display
-    height: 200px
-  .response-display
-    position: relative
-    resize: vertical
-    min-height: 75px
-    overflow: hidden
-    .response-display-title
-      position: absolute
-      bottom: 0
-      left: 24px
-      color: $green
-    .response-display-expand
-      position: absolute
-      bottom: 0
-      right: 0
-      color: $green
-      pointer-events: none
-      z-index: 2
+  &:not(:first-child) .display
+    height: 100px
   .ws-sent-display, .ws-response-display
+    position: relative
     display: inline
+    height: 100%
     float: left
   .ws-sent-display
     width: 35%

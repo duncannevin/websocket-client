@@ -15,13 +15,13 @@
           <span v-if="authenticated" class="delete-button" @click="deleteBody(ind)">&#215;</span>
         </template>
         <b-row>
-          <b-col cols="12">
+          <div class="display">
             <ace-editor
               v-model="tab.content"
               @init="editorInit"
               :theme="theme"
               :lang="tab.lang"
-              height="200px"
+              height="100%"
               width="100%"
             ></ace-editor>
             <b-button-group class="section-controls" size="sm">
@@ -34,11 +34,7 @@
               </b-dropdown>
               <b-button class="send-btn" variant="success" :disabled="!ws.connected" @click="ws.send(tab)">Send</b-button>
             </b-button-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
-          </b-col>
+          </div>
         </b-row>
       </b-tab>
       <b-nav-item slot="tabs" @click.prevent="newBody" href="#">
@@ -76,6 +72,7 @@ export default {
       require('brace/snippets/javascript')
       editor.setShowPrintMargin(false)
       editor.setOption('highlightActiveLine', false)
+      editor.renderer.setScrollMargin(0, 100, 0, 0)
     },
     newBody () {
       console.log('NEW BODY')

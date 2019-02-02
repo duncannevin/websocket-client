@@ -6,6 +6,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowAltCircleDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+require('jquery-ui-dist/jquery-ui.css')
+require('jquery-ui-dist/jquery-ui')
+
 library.add(faArrowAltCircleDown)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)

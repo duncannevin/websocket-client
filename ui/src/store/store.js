@@ -2,6 +2,7 @@ import Vuex from 'vuex'
 import Vue from 'vue'
 import Ws from '../services/Ws'
 import xmlFormat from 'xml-formatter'
+import {makeResizable} from '../utils'
 
 Vue.use(Vuex)
 
@@ -52,6 +53,7 @@ export default new Vuex.Store({
       const response = connection.responses.find((r) => r.bodyName === name)
       if (connection && response) {
         response.contents.unshift({lang, wsSent, wsResponse: formatResponse({lang, wsResponse})})
+        setTimeout(makeResizable, 200)
       }
     }
   },

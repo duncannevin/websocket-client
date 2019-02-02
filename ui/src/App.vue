@@ -7,8 +7,13 @@
 
 <script>
 import Navbar from './components/Navbar'
+import {makeResizable} from './utils'
+
 export default {
   name: 'App',
+  mounted () {
+    makeResizable()
+  },
   components: {
     Navbar
   }
@@ -42,6 +47,10 @@ body
 .row
   margin-right: 0
   margin-left: 0
+.ace_editor
+  resize: vertical
+.ace_content
+  padding-bottom: 100px
 .ace_scrollbar
   display: none
 .form-control:disabled
@@ -50,6 +59,18 @@ body
   cursor: not-allowed
 .delete-button
   color: $red
+.display
+  position: relative
+  height: 200px
+  min-height: 100px
+  width: 100%
+  border-bottom: 3px solid $green
+  .display-title
+    position: absolute
+    bottom: 0
+    font-size: 0.85rem
+    left: 30px
+    color: $green
 .nav-tabs
   border-bottom: none
   .nav-item
