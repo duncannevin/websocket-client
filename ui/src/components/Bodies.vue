@@ -38,11 +38,11 @@
         </b-row>
       </b-tab>
       <b-nav-item slot="tabs" @click.prevent="newBody" href="#">
-        +
+        <div class="add-icon">+</div>
       </b-nav-item>
       <div slot="empty" class="text-center text-muted">
         No bodies yet...
-        <br> Open a new tab using + button.
+        <br> Open a new tab using <span class="add-icon">+</span> button.
       </div>
     </b-tabs>
   </b-col>

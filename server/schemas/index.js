@@ -1,3 +1,4 @@
 const UserRepository = require('./user.schema')
+const ConnectionRepository = require('./connection.schema')
 
-module.exports = {UserRepository}
+module.exports = {UserRepository, ConnectionRepository}

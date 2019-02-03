@@ -4,3 +4,7 @@ export function makeResizable () {
     handles: 's'
   })
 }
+
+export function numberNames (list, name) {
+  // todo
+}

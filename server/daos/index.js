@@ -1,3 +1,4 @@
 const userDAO = require('./user.dao')
+const connectionDAO = require('./connection.dao')
 
-module.exports = {userDAO}
+module.exports = {userDAO, connectionDAO}

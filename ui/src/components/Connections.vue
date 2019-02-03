@@ -7,11 +7,15 @@
       v-for="(connection, ind) in connections"
       :key="'connection-tab-' + ind"
       :active="openTab === ind"
-      @click="selectConnection"
+      @click="openTab = ind"
     >
       <template slot="title">
-        <span class="tab-name" @dblclick="renameConnection($event, ind)">{{connection.name}}</span>
-        <span v-if="authenticated" class="delete-button" @click="deleteConnection(ind)">&#215;</span>
+        <span
+          class="tab-name"
+          @dblclick="renameConnection($event, ind)">
+          {{connection.name}}
+        </span>
+        <span class="delete-button" @click="deleteConnection(ind)">&#215;</span>
       </template>
       <connection
         :connection="connection"
@@ -19,11 +23,11 @@
       ></connection>
     </b-tab>
     <b-nav-item slot="tabs" @click.prevent="newConnection" href="#">
-      +
+      <div class="add-icon">+</div>
     </b-nav-item>
     <div slot="empty" class="text-center text-muted">
       No connections yet...
-      <br> Open a new tab using + button.
+      <br> Open a new tab using <span class="add-icon" @click="newConnection">+</span> button.
     </div>
   </b-tabs>
 </div>
@@ -31,6 +35,7 @@
 
 <script>
 import Connection from './Connection'
+
 export default {
   name: 'Connections',
   computed: {
@@ -39,22 +44,22 @@ export default {
     },
     authenticated () {
       return this.$store.getters.getAuthenticated
-    }
-  },
-  data () {
-    return {
-      openTab: 0
+    },
+    openTab: {
+      get () {
+        return this.$store.getters.getConnectionTab
+      },
+      set (ind) {
+        this.$store.dispatch('setConnectionTab', ind)
+      }
     }
   },
   methods: {
-    selectConnection (index) {
-      this.openTab = index
-    },
     newConnection () {
-      console.log('NEW CONNECTION')
+      this.$root.$emit('bv::show::modal', 'Add-connection')
     },
     deleteConnection (ind) {
-      this.connections.tabs.splice(ind, 1)
+      this.connections.splice(ind, 1)
     },
     renameConnection (evt, ind) {
       console.log('RENAME CONNECTION', ind)

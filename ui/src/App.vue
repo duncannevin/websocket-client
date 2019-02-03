@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="container">
+    <add-modal></add-modal>
     <navbar></navbar>
     <router-view/>
   </div>
@@ -8,14 +9,15 @@
 <script>
 import Navbar from './components/Navbar'
 import {makeResizable} from './utils'
-
+import AddModal from './components/AddModal'
 export default {
   name: 'App',
   mounted () {
     makeResizable()
   },
   components: {
-    Navbar
+    Navbar,
+    AddModal
   }
 }
 </script>
@@ -59,6 +61,16 @@ body
   cursor: not-allowed
 .delete-button
   color: $red
+.modal-content
+  background-color: $black
+  color: $white
+.add-icon:hover
+  cursor: pointer
+.add-icon
+  font-size: 1.5rem
+  color: $white
+.nav-link .add-icon
+  transform: translateY(-0.25rem)
 .display
   position: relative
   height: 200px
