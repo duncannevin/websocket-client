@@ -66,6 +66,8 @@ body
   color: $white
 .add-icon:hover
   cursor: pointer
+.text-muted
+  color: $gray-lighter!important
 .add-icon
   font-size: 1.5rem
   color: $white

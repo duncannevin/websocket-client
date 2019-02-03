@@ -1,27 +1,12 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import Ws from '../services/Ws'
-import xmlFormat from 'xml-formatter'
-import {makeResizable} from '../utils'
+import {makeResizable, formatResponse} from '../utils'
 import axios from 'axios'
 
 const connectionPath = '/connection'
 
 Vue.use(Vuex)
-
-function prettyPrintJSON (json) {
-  try {
-    return JSON.stringify(JSON.parse(json), null, '\t')
-  } catch (_) {
-    return json
-  }
-}
-
-function formatResponse ({lang, wsResponse}) {
-  return lang === 'json'
-    ? prettyPrintJSON(wsResponse) : lang === 'xml'
-      ? xmlFormat(wsResponse) : wsResponse
-}
 
 export default new Vuex.Store({
   state: {
