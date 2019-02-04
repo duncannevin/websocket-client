@@ -8,8 +8,8 @@ class ConnectionControl {
       const {name, url} = req.body
       let connection
       if (req.hasOwnProperty('payload')) {
-        const {_id} = req.payload
-        connection = await connectionDAO.save({userId: id, name, url})
+        const {id} = req.payload
+        connection = await connectionDAO.saveConnection({userId: id, name, url})
       } else {
         connection = connectionDAO.getUnauthorizedConnection({name, url})
       }
@@ -20,17 +20,14 @@ class ConnectionControl {
     }
   }
 
-  async createBody (req, res, next) {
+  async createWsBody (req, res, next) {
     try {
       const {connectionId, name} = req.body
-      let body
+      let wsBody = Object.assign({name}, {content: '', lang: 'json'})
       if (req.hasOwnProperty('payload')) {
-        const {_id} = req.payload
-        body = '???'
-      } else {
-        body = '???'
+        await connectionDAO.saveBody({connectionId, wsBody})
       }
-      res.status(201).send(body)
+      res.status(201).send(wsBody)
     } catch (error) {
       connectionLogger.debug('[createBody]', error)
       res.status(400).send({msg: error.message, code: 400})

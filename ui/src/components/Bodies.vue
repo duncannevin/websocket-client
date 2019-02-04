@@ -12,7 +12,7 @@
       >
         <template slot="title">
           <span class="tab-name">{{tab.name}}</span>
-          <span v-if="authenticated" class="delete-button" @click="deleteBody(ind)">&#215;</span>
+          <span class="delete-button" @click="deleteBody(ind)">&#215;</span>
         </template>
         <b-row>
           <div class="display">
@@ -61,6 +61,11 @@ export default {
       langs: ['json', 'xml', 'plain_text']
     }
   },
+  watch: {
+    bodies () {
+      this.activeTab = this.bodies.length - 1
+    }
+  },
   methods: {
     editorInit (editor) {
       require('brace/ext/language_tools')
@@ -75,7 +80,7 @@ export default {
       editor.renderer.setScrollMargin(0, 100, 0, 0)
     },
     newBody () {
-      console.log('NEW BODY')
+      this.$root.$emit('bv::show::modal', 'Add-body')
     },
     deleteBody (ind) {
       this.bodies.splice(ind, 1)

@@ -1,14 +1,38 @@
 const {ConnectionRepository} = require('../schemas')
 
 class ConnectionDAO {
+  /**
+   * @param name
+   * @param url
+   * @return {*}
+   */
   getUnauthorizedConnection ({name, url}) {
     return new ConnectionRepository({userId: 'un-authorized-user', name: name, url: url})
   }
 
-  async save ({userId, name, url}) {
+  /**
+   * @param userId
+   * @param name
+   * @param url
+   * @return {Promise<*>}
+   */
+  async saveConnection ({userId, name, url}) {
     const connection = new ConnectionRepository({userId, name, url})
     await connection.save()
     return connection
+  }
+
+  /**
+   * @param connectionId
+   * @param wsbody
+   * @return {Promise<*>}
+   */
+  async saveBody ({connectionId, wsBody}) {
+    const updated = await ConnectionRepository.updateOne(
+      {_id: connectionId},
+      {$push: {bodies: wsBody}}
+    )
+    return updated
   }
 }
 

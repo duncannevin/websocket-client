@@ -1,10 +1,7 @@
 const mongoose = require('mongoose')
 
 const Body = {
-  name: {
-    type: String,
-    unique: true
-  },
+  name: String,
   lang: String,
   content: String
 }
@@ -28,8 +25,8 @@ const ConnectionSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
-      unique: true,
-      required: true
+      required: true,
+      index: true
     },
     name: {
       type: String,
