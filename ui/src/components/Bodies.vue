@@ -15,7 +15,7 @@
           <span class="delete-button" @click="deleteBody(ind)">&#215;</span>
         </template>
         <b-row>
-          <div class="display">
+          <div class="section display">
             <ace-editor
               v-model="tab.content"
               @init="editorInit"

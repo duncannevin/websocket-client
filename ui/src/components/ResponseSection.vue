@@ -27,7 +27,7 @@
                 v-else
                 v-for="(content, cInd) in response.contents"
                 :key="'response-content-' + cInd"
-                class="response-editor"
+                class="section response-editor"
               >
                 <div class="display">
                   <div class="ws-sent-display">
