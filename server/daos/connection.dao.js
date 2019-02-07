@@ -28,11 +28,11 @@ class ConnectionDAO {
    * @return {Promise<*>}
    */
   async saveBody ({connectionId, wsBody}) {
-    const updated = await ConnectionRepository.updateOne(
+    const updated = await ConnectionRepository.findOneAndUpdate(
       {_id: connectionId},
       {$push: {bodies: wsBody}}
     )
-    return updated
+    return updated.bodies[updated.bodies.length - 1]
   }
 }
 

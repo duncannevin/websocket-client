@@ -12,18 +12,16 @@ export default new Vuex.Store({
   state: {
     connections: [],
     authenticated: false,
-    connectionTab: 0
+    connectionTab: 0,
+    bodiesTab: 0,
+    responsesTab: 0
   },
   mutations: {
-    PUSH_RESPONSE (state, { connectionName, name, lang, wsSent, wsResponse }) {
+    PUSH_RESPONSE (state, { connectionName, _id, lang, wsSent, wsResponse }) {
       const connection = state.connections.find((c) => c.name === connectionName)
-      const response = connection.responses.find((r) => r.bodyName === name)
-      if (connection && response) {
-        response.contents.unshift({ lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) })
-        setTimeout(makeResizable, 200)
-      } else {
-        console.log('need to implement')
-      }
+      const response = connection.responses.find((r) => r.bodyId === _id)
+      response.contents.unshift({ lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) })
+      setTimeout(makeResizable, 200)
     },
     CREATE_CONNECTION (state, { name, url }) {
       return new Promise((resolve) => {
@@ -42,6 +40,11 @@ export default new Vuex.Store({
         axios.post(connectionPath + '/create_body', { connectionId, name, lang })
           .then(({ data }) => {
             state.connections[state.connectionTab].bodies.push(data)
+            state.connections[state.connectionTab].responses.push({ bodyId: data._id, bodyName: name, contents: [] })
+            setTimeout(() => {
+              state.bodiesTab = state.connections[state.connectionTab].bodies.length - 1
+              state.responsesTab = state.connections[state.connectionTab].responses.length - 1
+            }, 80)
             resolve()
           })
           .catch(console.error)
@@ -49,6 +52,13 @@ export default new Vuex.Store({
     },
     SET_CONNECTION_TAB (state, index) {
       state.connectionTab = index
+    },
+    SET_BODIES_TAB (state, index) {
+      state.responsesTab = index
+      state.bodiesTab = index
+    },
+    SET_RESPONSES_TAB (state, index) {
+      state.responsesTabe = index
     }
   },
   actions: {
@@ -66,11 +76,19 @@ export default new Vuex.Store({
     },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)
+    },
+    setBodiesTab ({ commit }, index) {
+      commit('SET_BODIES_TAB', index)
+    },
+    setResponsesTab ({ commit }, index) {
+      commit('SET_RESPONSES_TAB', index)
     }
   },
   getters: {
     getConnections: state => state.connections,
     getAuthenticated: state => state.authenticated,
-    getConnectionTab: state => state.connectionTab
+    getConnectionTab: state => state.connectionTab,
+    getBodiesTab: state => state.bodiesTab,
+    getResponsesTab: state => state.responsesTab
   }
 })

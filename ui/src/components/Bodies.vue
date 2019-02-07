@@ -3,11 +3,11 @@
   <b-col>
     <b-tabs
       :no-key-nav="true"
+      v-model="activeTab"
     >
       <b-tab
         v-for="(tab, ind) in bodies"
         :key="'bodies-tab-' + ind"
-        :active="activeTab === ind"
         @click="activeTab = ind"
       >
         <template slot="title">
@@ -53,17 +53,21 @@
 import AceEditor from 'vue2-ace-editor'
 export default {
   name: 'Bodies',
+  computed: {
+    activeTab: {
+      get () {
+        return this.$store.getters.getBodiesTab
+      },
+      set (index) {
+        return this.$store.dispatch('setBodiesTab', index)
+      }
+    }
+  },
   data () {
     return {
-      activeTab: 0,
       theme: 'monokai',
       themes: ['monokai', 'chrome'],
       langs: ['json', 'xml', 'plain_text']
-    }
-  },
-  watch: {
-    bodies () {
-      this.activeTab = this.bodies.length - 1
     }
   },
   methods: {
