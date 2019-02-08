@@ -1,4 +1,4 @@
-const {ConnectionRepository} = require('../schemas')
+const { ConnectionRepository } = require('../schemas')
 
 class ConnectionDAO {
   /**
@@ -6,8 +6,8 @@ class ConnectionDAO {
    * @param url
    * @return {*}
    */
-  getUnauthorizedConnection ({name, url}) {
-    return new ConnectionRepository({userId: 'un-authorized-user', name: name, url: url})
+  getUnauthorizedConnection ({ name, url }) {
+    return new ConnectionRepository({ userId: 'un-authorized-user', name: name, url: url })
   }
 
   /**
@@ -16,8 +16,8 @@ class ConnectionDAO {
    * @param url
    * @return {Promise<*>}
    */
-  async saveConnection ({userId, name, url}) {
-    const connection = new ConnectionRepository({userId, name, url})
+  async saveConnection ({ userId, name, url }) {
+    const connection = new ConnectionRepository({ userId, name, url })
     await connection.save()
     return connection
   }
@@ -27,12 +27,24 @@ class ConnectionDAO {
    * @param wsbody
    * @return {Promise<*>}
    */
-  async saveBody ({connectionId, wsBody}) {
+  async saveBody ({ connectionId, wsBody }) {
     const updated = await ConnectionRepository.findOneAndUpdate(
-      {_id: connectionId},
-      {$push: {bodies: wsBody}}
+      { _id: connectionId },
+      { $push: { bodies: wsBody } }
     )
     return updated.bodies[updated.bodies.length - 1]
+  }
+
+  /**
+   * @param connectionId
+   * @param wsResponse
+   * @return {Promise<void>}
+   */
+  async saveResponse ({ connectionId, wsResponse }) {
+    return await ConnectionRepository.updateOne(
+      { _id: connectionId },
+      { $push: { responses: wsResponse } }
+    )
   }
 }
 

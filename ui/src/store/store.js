@@ -38,9 +38,9 @@ export default new Vuex.Store({
     CREATE_BODY (state, { connectionId, name, lang }) {
       return new Promise((resolve) => {
         axios.post(connectionPath + '/create_body', { connectionId, name, lang })
-          .then(({ data }) => {
-            state.connections[state.connectionTab].bodies.push(data)
-            state.connections[state.connectionTab].responses.push({ bodyId: data._id, bodyName: name, contents: [] })
+          .then(({ data: {wsBody, wsResponse} }) => {
+            state.connections[state.connectionTab].bodies.push(wsBody)
+            state.connections[state.connectionTab].responses.push(wsResponse)
             setTimeout(() => {
               state.bodiesTab = state.connections[state.connectionTab].bodies.length - 1
               state.responsesTab = state.connections[state.connectionTab].responses.length - 1
