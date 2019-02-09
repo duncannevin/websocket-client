@@ -2,7 +2,7 @@
   <b-navbar variant="faded" type="dark">
     <b-navbar-brand href="#">Awesome Websocket Client</b-navbar-brand>
     <b-navbar-nav class="ml-auto">
-      <b-nav-item>Sign In</b-nav-item>
+      <b-nav-item @click="openAuth">Sign In</b-nav-item>
     </b-navbar-nav>
 </b-navbar>
 </template>
@@ -13,6 +13,11 @@ export default {
   computed: {
     authenticated () {
       return this.$store.getters.getAuthenticated
+    }
+  },
+  methods: {
+    openAuth () {
+      this.$root.$emit('bv::show::modal', 'Auth')
     }
   }
 }

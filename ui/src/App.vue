@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="container">
+    <auth></auth>
     <add-modal></add-modal>
     <navbar></navbar>
     <router-view/>
@@ -10,6 +11,7 @@
 import Navbar from './components/Navbar'
 import {makeResizable} from './utils'
 import AddModal from './components/AddModal'
+import Auth from './components/Auth'
 export default {
   name: 'App',
   mounted () {
@@ -17,7 +19,8 @@ export default {
   },
   components: {
     Navbar,
-    AddModal
+    AddModal,
+    Auth
   }
 }
 </script>
