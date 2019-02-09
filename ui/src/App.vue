@@ -67,7 +67,7 @@ body
 .add-icon:hover
   cursor: pointer
 .text-muted
-  color: $gray-lighter!important
+  color: $gray-light!important
 .add-icon
   font-size: 1.5rem
   color: $white
@@ -127,4 +127,14 @@ body
 
 .zoomIn
   animation-name: zoomIn
+
+@keyframes blink
+  50%
+    color: transparent
+.loader-dot
+  animation: 1s blink infinite
+.loader-dot:nth-child(2)
+  animation-delay: 250ms
+.loader-dot:nth-child(3)
+  animation-delay: 500ms
 </style>

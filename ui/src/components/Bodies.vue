@@ -41,7 +41,8 @@
         <div class="add-icon">+</div>
       </b-nav-item>
       <div slot="empty" class="text-center text-muted">
-        No bodies yet...
+        No bodies yet<span class="loader-dot">.</span><span class="loader-dot">.</span><span class="loader-dot">.</span>
+
         <br> Open a new tab using <span class="add-icon">+</span> button.
       </div>
     </b-tabs>

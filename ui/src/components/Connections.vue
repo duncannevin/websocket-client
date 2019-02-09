@@ -26,7 +26,7 @@
       <div class="add-icon">+</div>
     </b-nav-item>
     <div slot="empty" class="text-center text-muted">
-      No connections yet...
+      No connections yet<span class="loader-dot">.</span><span class="loader-dot">.</span><span class="loader-dot">.</span>
       <br> Open a new tab using <span class="add-icon" @click="newConnection">+</span> button.
     </div>
   </b-tabs>

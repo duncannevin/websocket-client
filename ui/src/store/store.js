@@ -1,7 +1,7 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import Ws from '../services/Ws'
-import { makeResizable, formatResponse } from '../utils'
+import { formatResponse, makeResizable } from '../utils'
 import axios from 'axios'
 
 const connectionPath = '/connection'
@@ -58,6 +58,35 @@ export default new Vuex.Store({
           .catch(console.error)
       })
     },
+    CREATE_COOKIE (state, { key, value }) {
+      const connectionId = state.connections[state.connectionTab]._id
+      return new Promise((resolve) => {
+        axios.post(connectionPath + '/create_cookie', { connectionId, key, value })
+          .then(({ data: { key, value } }) => {
+            if (state.connections[state.connectionTab].cookies.some((c) => c.key === key)) {
+              state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.map((c) => {
+                if (c.key === key) c.value = value
+                return c
+              })
+            } else {
+              state.connections[state.connectionTab].cookies.push({ key, value })
+            }
+            resolve()
+          })
+          .catch(console.error)
+      })
+    },
+    REMOVE_COOKIE (state, { key }) {
+      const connectionId = state.connections[state.connectionTab]._id
+      return new Promise((resolve) => {
+        axios.put(connectionPath + '/remove_cookie', { connectionId, key })
+          .then(() => {
+            state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.filter((c) => c.key !== key)
+            resolve()
+          })
+          .catch(console.error)
+      })
+    },
     SET_CONNECTION_TAB (state, index) {
       state.connectionTab = index
     },
@@ -81,6 +110,12 @@ export default new Vuex.Store({
     },
     createBody ({ commit }, { name, url }) {
       commit('CREATE_BODY', { name, url })
+    },
+    createCookie ({ commit }, { key, value }) {
+      commit('CREATE_COOKIE', { key, value })
+    },
+    removeCookie ({ commit }, { key }) {
+      commit('REMOVE_COOKIE', { key })
     },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)

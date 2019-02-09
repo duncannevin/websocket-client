@@ -39,10 +39,6 @@ const ConnectionSchema = new mongoose.Schema(
       type: String
     },
     cookies: {
-      type: [Body],
-      default: []
-    },
-    headers: {
       type: [Header],
       default: []
     },

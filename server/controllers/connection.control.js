@@ -54,6 +54,30 @@ class ConnectionControl {
       res.status(400).send({ msg: error.message, code: 400 })
     }
   }
+
+  async saveCookie (req, res, next) {
+    try {
+      const { connectionId, key, value } = req.body
+      if (req.hasOwnProperty('payload')) {
+        await connectionDAO.saveCookie({ connectionId, key, value })
+      }
+      res.status(201).cookie(key, value).send({ key, value })
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
+
+  async removeCookie (req, res, next) {
+    try {
+      const { connectionId, key } = req.body
+      if (req.hasOwnProperty('payload')) {
+        await connectionDAO.deleteCookie({ connectionId, key })
+      }
+      res.status(200).clearCookie(key).send()
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
 }
 
 module.exports = new ConnectionControl()

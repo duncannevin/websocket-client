@@ -62,6 +62,22 @@ class ConnectionDAO {
       { $push: { 'responses.$.contents': wsResponse } }
     )
   }
+
+  async saveCookie ({ connectionId, key, value }) {
+    return await ConnectionRepository.updateOne(
+      { _id: connectionId },
+      { $push: { cookies: { key, value } } }
+    )
+  }
+
+  async deleteCookie ({ connectionId, key }) {
+    const updated = await ConnectionRepository.findOneAndUpdate(
+      { _id: connectionId },
+      { $pull: { cookies: { key } } },
+      { multi: true, new: true}
+    )
+    return updated.cookies
+  }
 }
 
 module.exports = new ConnectionDAO()

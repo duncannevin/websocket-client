@@ -11,7 +11,6 @@
       >
         <bodies v-if="tab[0] === 'bodies'" :ws="connection.ws" :bodies="tab[1]" :responses="tab[2]"></bodies>
         <cookies v-if="tab[0] === 'cookies'" :cookies="tab[1]"></cookies>
-        <headers v-if="tab[0] === 'headers'" :headers="tab[1]"></headers>
       </b-tab>
     </b-tabs>
   </b-col>
@@ -21,12 +20,11 @@
 <script>
 import Bodies from './Bodies'
 import Cookies from './Cookies'
-import Headers from './Headers'
 export default {
   name: 'RequestSection',
   computed: {
     dataInOrder () {
-      return [['bodies', this.connection.bodies, this.connection.responses], ['cookies', this.connection.cookies], ['headers', this.connection.headers]]
+      return [['bodies', this.connection.bodies, this.connection.responses], ['cookies', this.connection.cookies]]
     }
   },
   data () {
@@ -36,8 +34,7 @@ export default {
   },
   components: {
     Bodies,
-    Cookies,
-    Headers
+    Cookies
   },
   props: ['connection', 'authenticated']
 }

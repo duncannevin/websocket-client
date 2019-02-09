@@ -19,8 +19,8 @@
                 <span class="tab-name">{{response.bodyName}}</span>
               </template>
               <b-row v-if="!response.contents.length">
-                <div class="text-center text-muted">
-                  Nothing yet...
+                <div class="text-center text-muted section">
+                  Waiting for a response<span class="loader-dot">.</span><span class="loader-dot">.</span><span class="loader-dot">.</span>
                 </div>
               </b-row>
               <b-row
@@ -68,6 +68,9 @@
           </b-tabs>
         </b-row>
       </b-tab>
+      <div v-if="!responses.length" class="text-center text-muted">
+        This is where your responses will appear.
+      </div>
     </b-tabs>
   </b-col>
 </b-row>
