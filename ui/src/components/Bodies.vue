@@ -88,12 +88,13 @@ export default {
     },
     deleteBody (ind) {
       this.bodies.splice(ind, 1)
+      this.responses.splice(ind, 1)
     }
   },
   components: {
     AceEditor
   },
-  props: ['bodies', 'ws', 'authenticated']
+  props: ['bodies', 'responses', 'ws', 'authenticated']
 }
 </script>
 

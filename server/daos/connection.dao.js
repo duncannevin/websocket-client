@@ -30,7 +30,8 @@ class ConnectionDAO {
   async saveBody ({ connectionId, wsBody }) {
     const updated = await ConnectionRepository.findOneAndUpdate(
       { _id: connectionId },
-      { $push: { bodies: wsBody } }
+      { $push: { bodies: wsBody } },
+      { new: true }
     )
     return updated.bodies[updated.bodies.length - 1]
   }
@@ -38,12 +39,27 @@ class ConnectionDAO {
   /**
    * @param connectionId
    * @param wsResponse
-   * @return {Promise<void>}
+   * @return {Promise<*>}
    */
   async saveResponse ({ connectionId, wsResponse }) {
-    return await ConnectionRepository.updateOne(
+    const updated = await ConnectionRepository.findOneAndUpdate(
       { _id: connectionId },
-      { $push: { responses: wsResponse } }
+      { $push: { responses: wsResponse } },
+      { new: true }
+    )
+    return updated.responses[updated.responses.length - 1]
+  }
+
+  /**
+   * @param connectionId
+   * @param _id
+   * @param wsResponse
+   * @return {Promise<void>}
+   */
+  async updateResponseContents ({ connectionId, responseId, wsResponse }) {
+    return await ConnectionRepository.updateOne(
+      { _id: connectionId, 'responses._id': responseId },
+      { $push: { 'responses.$.contents': wsResponse } }
     )
   }
 }

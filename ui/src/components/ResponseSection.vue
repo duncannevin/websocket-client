@@ -3,7 +3,7 @@
   <b-col>
     <b-tabs>
       <b-tab
-        title="Responses"
+        title="responses"
       >
         <b-row class="section responses-section">
           <b-tabs

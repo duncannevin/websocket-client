@@ -17,17 +17,25 @@ export default new Vuex.Store({
     responsesTab: 0
   },
   mutations: {
-    PUSH_RESPONSE (state, { connectionName, _id, lang, wsSent, wsResponse }) {
-      const connection = state.connections.find((c) => c.name === connectionName)
-      const response = connection.responses.find((r) => r.bodyId === _id)
-      response.contents.unshift({ lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) })
-      setTimeout(makeResizable, 200)
+    PUSH_RESPONSE (state, { connectionId, bodyId, lang, wsSent, wsResponse }) {
+      const connection = state.connections.find((c) => c._id === connectionId)
+      const response = connection.responses.find((r) => r.bodyId === bodyId)
+      const newResponse = { lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) }
+      return new Promise((resolve) => {
+        axios.put(connectionPath + '/update_response', { connectionId, responseId: response._id, newResponse })
+          .then(({ data: { newResponse } }) => {
+            response.contents.unshift(newResponse)
+            setTimeout(makeResizable, 200)
+            resolve()
+          })
+          .catch(console.error)
+      })
     },
     CREATE_CONNECTION (state, { name, url }) {
       return new Promise((resolve) => {
         axios.post(connectionPath + '/create_connection', { name, url })
           .then(({ data }) => {
-            data.ws = new Ws(data.name, data.url)
+            data.ws = new Ws(data)
             state.connections.push(data)
             state.connectionTab = state.connections.length - 1
             resolve()
@@ -38,7 +46,7 @@ export default new Vuex.Store({
     CREATE_BODY (state, { connectionId, name, lang }) {
       return new Promise((resolve) => {
         axios.post(connectionPath + '/create_body', { connectionId, name, lang })
-          .then(({ data: {wsBody, wsResponse} }) => {
+          .then(({ data: { wsBody, wsResponse } }) => {
             state.connections[state.connectionTab].bodies.push(wsBody)
             state.connections[state.connectionTab].responses.push(wsResponse)
             setTimeout(() => {

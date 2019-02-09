@@ -13,6 +13,7 @@ class ConnectionControl {
         connection = await connectionDAO.saveConnection({ userId: id, name, url })
       } else {
         connection = connectionDAO.getUnauthorizedConnection({ name, url })
+        connection._id = uId(24)
       }
       res.status(201).send(connection)
     } catch (error) {
@@ -28,14 +29,28 @@ class ConnectionControl {
       let wsResponse = { bodyName: name, contents: [] }
       if (req.hasOwnProperty('payload')) {
         wsBody = await connectionDAO.saveBody({ connectionId, wsBody })
-        await connectionDAO.saveResponse({ connectionId, wsResponse })
+        wsResponse.bodyId = wsBody._id
+        wsResponse = await connectionDAO.saveResponse({ connectionId, wsResponse })
       } else {
         wsBody._id = uId(24)
+        wsResponse.bodyId = wsBody._id
+        wsResponse._id = uId(24)
       }
-      wsResponse.bodyId = wsBody._id
       res.status(201).send({ wsBody, wsResponse })
     } catch (error) {
       connectionLogger.debug('[createBody]', error)
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
+
+  async updateResponseContents (req, res, next) {
+    try {
+      const { connectionId, responseId, newResponse } = req.body
+      if (req.hasOwnProperty('payload')) {
+        await connectionDAO.updateResponseContents({ connectionId, responseId, newResponse })
+      }
+      res.status(201).send({ newResponse })
+    } catch (error) {
       res.status(400).send({ msg: error.message, code: 400 })
     }
   }

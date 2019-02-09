@@ -1,9 +1,10 @@
 import $store from '../store/store'
 
 class Ws {
-  constructor (name, connection) {
+  constructor ({ name, url, _id }) {
     this.name = name
-    this.connection = connection
+    this.connection = url
+    this.connectionId = _id
     this.connected = false
     this._ws = null
     this._lastBody = null
@@ -27,12 +28,14 @@ class Ws {
       this.connected = false
       console.log(`${this.connection.toUpperCase()} WS CLOSED`)
     }
-    this._ws.onmessage = ({data}) => {
-      $store.dispatch('pushResponse', Object.assign(this._lastBody, {
-        connectionName: this.name,
-        wsSent: Object.assign({}, this._lastBody),
+    this._ws.onmessage = ({ data }) => {
+      $store.dispatch('pushResponse', {
+        connectionId: this.connectionId,
+        bodyId: this._lastBody._id,
+        lang: this._lastBody.lang,
+        wsSent: this._lastBody,
         wsResponse: data
-      }))
+      })
     }
   }
 

@@ -13,6 +13,7 @@ const Header = {
 
 const Response = {
   bodyName: String,
+  bodyId: String,
   lang: String,
   contents: [{
     lang: String,
