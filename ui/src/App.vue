@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="container">
+    <messages></messages>
     <auth></auth>
     <add-modal></add-modal>
     <navbar></navbar>
@@ -12,12 +13,14 @@ import Navbar from './components/Navbar'
 import {makeResizable} from './utils'
 import AddModal from './components/AddModal'
 import Auth from './components/Auth'
+import Messages from './components/Messages'
 export default {
   name: 'App',
   mounted () {
     makeResizable()
   },
   components: {
+    Messages,
     Navbar,
     AddModal,
     Auth

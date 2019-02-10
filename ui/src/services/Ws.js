@@ -1,4 +1,5 @@
 import $store from '../store/store'
+import { Message } from './Message'
 
 class Ws {
   constructor ({ name, url, _id }) {
@@ -18,15 +19,15 @@ class Ws {
     this._ws = new WebSocket(this.connection)
     this._ws.onopen = () => {
       this.connected = true
-      console.log(`${this.connection.toUpperCase()} WS OPEN`)
+      Message(`[WS OPEN] ${this.name}`, 'success')
     }
     this._ws.onerror = (err) => {
       this.connected = false
-      console.error(`${this.connection.toUpperCase()} WS FAILED`, err)
+      Message(`[CONNECTION FAILED] ${this.name}: ${err}`, 'warn')
     }
     this._ws.onclose = () => {
       this.connected = false
-      console.log(`${this.connection.toUpperCase()} WS CLOSED`)
+      Message(`[WS CLOSED] ${this.name}`, 'warn')
     }
     this._ws.onmessage = ({ data }) => {
       $store.dispatch('pushResponse', {

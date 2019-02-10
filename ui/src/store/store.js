@@ -15,7 +15,8 @@ export default new Vuex.Store({
     connectionTab: 0,
     bodiesTab: 0,
     responsesTab: 0,
-    queuedNextAction: () => {}
+    queuedNextAction: () => {},
+    messages: []
   },
   mutations: {
     PUSH_RESPONSE (state, { connectionId, bodyId, lang, wsSent, wsResponse }) {
@@ -100,6 +101,12 @@ export default new Vuex.Store({
     },
     SET_QUEUED_NEXT (state, fn) {
       state.queuedNextAction = fn
+    },
+    PUSH_MESSAGE (state, message) {
+      state.messages.unshift(message)
+    },
+    REMOVE_MESSAGE (state, { id }) {
+      state.messages = state.messages.filter((m) => m.id !== id)
     }
   },
   actions: {
@@ -130,8 +137,14 @@ export default new Vuex.Store({
     setResponsesTab ({ commit }, index) {
       commit('SET_RESPONSES_TAB', index)
     },
-    setQueuedNext ({commit}, fn) {
+    setQueuedNext ({ commit }, fn) {
       commit('SET_QUEUED_NEXT', fn)
+    },
+    pushMessage ({ commit }, message) {
+      commit('PUSH_MESSAGE', message)
+    },
+    removeMessage ({ commit }, { id }) {
+      commit('REMOVE_MESSAGE', { id })
     }
   },
   getters: {
@@ -140,6 +153,7 @@ export default new Vuex.Store({
     getConnectionTab: state => state.connectionTab,
     getBodiesTab: state => state.bodiesTab,
     getResponsesTab: state => state.responsesTab,
-    getQueuedNext: state => state.queuedNextAction
+    getQueuedNext: state => state.queuedNextAction,
+    getMessages: state => state.messages
   }
 })
