@@ -47,6 +47,9 @@ export default {
   computed: {
     parsedMode () {
       return this.mode.split('_').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')
+    },
+    queuedNext () {
+      return this.$store.getters.getQueuedNext
     }
   },
   data () {
@@ -64,6 +67,7 @@ export default {
     signIn () {},
     closeAuth () {
       this.$root.$emit('bv::hide::modal', 'Auth')
+      this.queuedNext()
     }
   }
 }

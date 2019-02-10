@@ -56,7 +56,15 @@ export default {
   },
   methods: {
     newConnection () {
-      this.$root.$emit('bv::show::modal', 'Add-connection')
+      if (!this.authenticated) {
+        this.$store.dispatch('setQueuedNext', () => {
+          this.$root.$emit('bv::show::modal', 'Add-connection')
+          this.$store.dispatch('setQueuedNext', () => {})
+        })
+        this.$root.$emit('bv::show::modal', 'Auth')
+      } else {
+        this.$root.$emit('bv::show::modal', 'Add-connection')
+      }
     },
     deleteConnection (ind) {
       this.connections.splice(ind, 1)

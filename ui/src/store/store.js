@@ -14,7 +14,8 @@ export default new Vuex.Store({
     authenticated: false,
     connectionTab: 0,
     bodiesTab: 0,
-    responsesTab: 0
+    responsesTab: 0,
+    queuedNextAction: () => {}
   },
   mutations: {
     PUSH_RESPONSE (state, { connectionId, bodyId, lang, wsSent, wsResponse }) {
@@ -96,6 +97,9 @@ export default new Vuex.Store({
     },
     SET_RESPONSES_TAB (state, index) {
       state.responsesTabe = index
+    },
+    SET_QUEUED_NEXT (state, fn) {
+      state.queuedNextAction = fn
     }
   },
   actions: {
@@ -125,6 +129,9 @@ export default new Vuex.Store({
     },
     setResponsesTab ({ commit }, index) {
       commit('SET_RESPONSES_TAB', index)
+    },
+    setQueuedNext ({commit}, fn) {
+      commit('SET_QUEUED_NEXT', fn)
     }
   },
   getters: {
@@ -132,6 +139,7 @@ export default new Vuex.Store({
     getAuthenticated: state => state.authenticated,
     getConnectionTab: state => state.connectionTab,
     getBodiesTab: state => state.bodiesTab,
-    getResponsesTab: state => state.responsesTab
+    getResponsesTab: state => state.responsesTab,
+    getQueuedNext: state => state.queuedNextAction
   }
 })

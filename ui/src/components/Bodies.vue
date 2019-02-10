@@ -85,7 +85,15 @@ export default {
       editor.renderer.setScrollMargin(0, 100, 0, 0)
     },
     newBody () {
-      this.$root.$emit('bv::show::modal', 'Add-body')
+      if (!this.authenticated) {
+        this.$store.dispatch('setQueuedNext', () => {
+          this.$root.$emit('bv::show::modal', 'Add-body')
+          this.$store.dispatch('setQueuedNext', () => {})
+        })
+        this.$root.$emit('bv::show::modal', 'Auth')
+      } else {
+        this.$root.$emit('bv::show::modal', 'Add-body')
+      }
     },
     deleteBody (ind) {
       this.bodies.splice(ind, 1)
