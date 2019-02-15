@@ -78,6 +78,18 @@ class ConnectionControl {
       res.status(400).send({ msg: error.message, code: 400 })
     }
   }
+
+  async removeBody (req, res, next) {
+    try {
+      const { connectionId, bodyId } = req.body
+      if (req.hasOwnProperty('payload')) {
+        await connectionDAO.deleteBody({ connectionId, bodyId })
+      }
+      res.status(200).send()
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
 }
 
 module.exports = new ConnectionControl()

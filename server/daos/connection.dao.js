@@ -74,9 +74,23 @@ class ConnectionDAO {
     const updated = await ConnectionRepository.findOneAndUpdate(
       { _id: connectionId },
       { $pull: { cookies: { key } } },
-      { multi: true, new: true}
+      { multi: true, new: true }
     )
     return updated.cookies
+  }
+
+  async deleteBody ({ connectionId, bodyId }) {
+    const updated = await ConnectionRepository.findOneAndUpdate(
+      { _id: connectionId },
+      {
+        $pull: {
+          bodies: { _id: bodyId },
+          responses: { bodyId }
+        }
+      },
+      { multi: true, new: true }
+    )
+    return updated.bodies
   }
 }
 

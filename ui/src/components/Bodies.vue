@@ -12,7 +12,7 @@
       >
         <template slot="title">
           <span class="tab-name">{{tab.name}}</span>
-          <span class="delete-button" @click="deleteBody(ind)">&#215;</span>
+          <span class="delete-button" @click="deleteBody(tab._id)">&#215;</span>
         </template>
         <b-row>
           <div class="section display">
@@ -95,9 +95,8 @@ export default {
         this.$root.$emit('bv::show::modal', 'Add-body')
       }
     },
-    deleteBody (ind) {
-      this.bodies.splice(ind, 1)
-      this.responses.splice(ind, 1)
+    deleteBody (bodyId) {
+      this.$store.dispatch('removeBody', { bodyId })
     }
   },
   components: {

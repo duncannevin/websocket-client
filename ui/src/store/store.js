@@ -89,6 +89,18 @@ export default new Vuex.Store({
           .catch(console.error)
       })
     },
+    REMOVE_BODY (state, { bodyId }) {
+      const connectionId = state.connections[state.connectionTab]._id
+      return new Promise((resolve) => {
+        axios.put(connectionPath + '/remove_body', { connectionId, bodyId })
+          .then(() => {
+            state.connections[state.connectionTab].bodies = state.connections[state.connectionTab].bodies.filter((c) => c._id !== bodyId)
+            state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.filter((c) => c.bodyId !== bodyId)
+            resolve()
+          })
+          .catch(console.error)
+      })
+    },
     SET_CONNECTION_TAB (state, index) {
       state.connectionTab = index
     },
@@ -127,6 +139,9 @@ export default new Vuex.Store({
     },
     removeCookie ({ commit }, { key }) {
       commit('REMOVE_COOKIE', { key })
+    },
+    removeBody ({ commit }, { bodyId }) {
+      commit('REMOVE_BODY', { bodyId })
     },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)
