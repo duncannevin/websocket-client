@@ -57,10 +57,12 @@ class ConnectionDAO {
    * @return {Promise<void>}
    */
   async updateResponseContents ({ connectionId, responseId, wsResponse }) {
-    return await ConnectionRepository.updateOne(
+    const updated = await ConnectionRepository.findOneAndUpdate(
       { _id: connectionId, 'responses._id': responseId },
-      { $push: { 'responses.$.contents': wsResponse } }
+      { $push: { 'responses.$.contents': wsResponse } },
+      { new: true }
     )
+    return updated.responses.find((res) => res._id.toString() === responseId)[0].contents.slice(-1)
   }
 
   async saveCookie ({ connectionId, key, value }) {
@@ -91,6 +93,21 @@ class ConnectionDAO {
       { multi: true, new: true }
     )
     return updated.bodies
+  }
+
+  async deleteResponse ({ connectionId, responseId, contentId }) {
+    return await ConnectionRepository.findOne(
+      { _id: connectionId }
+    )
+      .then((connection) => {
+        connection.responses = connection.responses.map((res) => {
+          if (res._id.toString() === responseId) {
+            res.contents = res.contents.filter((cont) => cont === null || (cont._id.toString() !== contentId))
+          }
+          return res
+        })
+        connection.save()
+      })
   }
 }
 

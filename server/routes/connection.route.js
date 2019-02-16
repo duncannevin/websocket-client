@@ -10,5 +10,6 @@ connectionRouter.post('/create_cookie', optional, connectionControl.saveCookie)
 connectionRouter.put('/update_response', optional, connectionControl.updateResponseContents)
 connectionRouter.put('/remove_cookie', optional, connectionControl.removeCookie)
 connectionRouter.put('/remove_body', optional, connectionControl.removeBody)
+connectionRouter.put('/remove_response', optional, connectionControl.removeResponse)
 
 module.exports = connectionRouter

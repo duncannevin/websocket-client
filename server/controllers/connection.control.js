@@ -45,11 +45,14 @@ class ConnectionControl {
 
   async updateResponseContents (req, res, next) {
     try {
-      const { connectionId, responseId, newResponse } = req.body
+      const { connectionId, responseId, wsResponse } = req.body
+      let newResponse;
       if (req.hasOwnProperty('payload')) {
-        await connectionDAO.updateResponseContents({ connectionId, responseId, newResponse })
+        newResponse = await connectionDAO.updateResponseContents({ connectionId, responseId, wsResponse })
+      } else {
+        newResponse = Object.assign(wsResponse, { _id: uId(24) })
       }
-      res.status(201).send({ newResponse })
+      res.status(201).send({ wsResponse: newResponse })
     } catch (error) {
       res.status(400).send({ msg: error.message, code: 400 })
     }
@@ -84,6 +87,18 @@ class ConnectionControl {
       const { connectionId, bodyId } = req.body
       if (req.hasOwnProperty('payload')) {
         await connectionDAO.deleteBody({ connectionId, bodyId })
+      }
+      res.status(200).send()
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
+
+  async removeResponse (req, res, next) {
+    try {
+      const { connectionId, responseId, contentId } = req.body
+      if (req.hasOwnProperty('payload')) {
+        await connectionDAO.deleteResponse({ connectionId, responseId, contentId })
       }
       res.status(200).send()
     } catch (error) {

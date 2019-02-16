@@ -59,7 +59,7 @@
                           @click="changeLang(lang, response.contents[cInd])"
                         >{{lang.toUpperCase()}}</b-dropdown-item>
                       </b-dropdown>
-                      <b-button class="delete-button" @click="deleteResponse(cInd, response.contents)">&#215;</b-button>
+                      <b-button class="delete-button" @click="deleteResponse(response._id, content._id)">&#215;</b-button>
                     </b-button-group>
                   </div>
                 </div>
@@ -111,8 +111,8 @@ export default {
       editor.setOption('highlightActiveLine', false)
       editor.setShowPrintMargin(false)
     },
-    deleteResponse (ind, contents) {
-      contents.splice(ind, 1)
+    deleteResponse (responseId, contentId) {
+      this.$store.dispatch('removeResponse', { responseId, contentId })
     },
     changeLang (lang, res) {
       res.lang = lang

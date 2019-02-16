@@ -24,9 +24,9 @@ export default new Vuex.Store({
       const response = connection.responses.find((r) => r.bodyId === bodyId)
       const newResponse = { lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) }
       return new Promise((resolve) => {
-        axios.put(connectionPath + '/update_response', { connectionId, responseId: response._id, newResponse })
-          .then(({ data: { newResponse } }) => {
-            response.contents.unshift(newResponse)
+        axios.put(connectionPath + '/update_response', { connectionId, responseId: response._id, wsResponse: newResponse })
+          .then(({ data: { wsResponse } }) => {
+            response.contents.unshift(wsResponse)
             setTimeout(makeResizable, 200)
             resolve()
           })
@@ -101,6 +101,22 @@ export default new Vuex.Store({
           .catch(console.error)
       })
     },
+    REMOVE_RESPONSE (state, { responseId, contentId }) {
+      const connectionId = state.connections[state.connectionTab]._id
+      return new Promise((resolve) => {
+        axios.put(connectionPath + '/remove_response', { connectionId, responseId, contentId })
+          .then(() => {
+            state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.map((res) => {
+              if (res._id === responseId) {
+                res.contents = res.contents.filter((cont) => cont._id !== contentId)
+              }
+              return res
+            })
+            resolve()
+          })
+          .catch(console.error)
+      })
+    },
     SET_CONNECTION_TAB (state, index) {
       state.connectionTab = index
     },
@@ -142,6 +158,9 @@ export default new Vuex.Store({
     },
     removeBody ({ commit }, { bodyId }) {
       commit('REMOVE_BODY', { bodyId })
+    },
+    removeResponse ({ commit }, { responseId, contentId }) {
+      commit('REMOVE_RESPONSE', { responseId, contentId })
     },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)
