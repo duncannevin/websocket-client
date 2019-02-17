@@ -4,6 +4,38 @@ const connectionLogger = getLogger('connection')
 const uId = require('uniqid')
 
 class ConnectionControl {
+  async removeConnection (req, res, next) {
+    try {
+      const { connectionId } = req.params
+      if (req.hasOwnProperty('payload')) {
+        await connectionDAO.deleteConnection({ connectionId })
+      }
+      res.status(201).send()
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
+
+  async getConnections (req, res, next) {
+    try {
+      const { id } = req.payload
+      const connections = await connectionDAO.getConnections({ userId: id })
+      res.status(200).send({ connections })
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
+
+  async getConnection (req, res, next) {
+    try {
+      const { connectionId } = req.params
+      const connection = await connectionDAO.getConnection({ connectionId })
+      res.send({ connection })
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
+
   async createConnection (req, res, next) {
     try {
       const { name, url } = req.body

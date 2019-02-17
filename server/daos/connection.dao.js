@@ -1,6 +1,18 @@
 const { ConnectionRepository } = require('../schemas')
 
 class ConnectionDAO {
+  async deleteConnection ({ connectionId }) {
+    return await ConnectionRepository.deleteOne({ _id: connectionId })
+  }
+
+  async getConnections ({ userId }) {
+    return await ConnectionRepository.find({ userId })
+  }
+
+  async getConnection ({ connectionId }) {
+    return await ConnectionRepository.find({ _id: connectionId })
+  }
+
   /**
    * @param name
    * @param url

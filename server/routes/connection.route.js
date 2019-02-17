@@ -12,4 +12,9 @@ connectionRouter.put('/remove_cookie', optional, connectionControl.removeCookie)
 connectionRouter.put('/remove_body', optional, connectionControl.removeBody)
 connectionRouter.put('/remove_response', optional, connectionControl.removeResponse)
 
+connectionRouter.get('/get_connections', required, connectionControl.getConnections)
+connectionRouter.get('/get_connection/:connectionId', required, connectionControl.getConnection)
+
+connectionRouter.delete('/remove_connection/:connectionId', optional, connectionControl.removeConnection)
+
 module.exports = connectionRouter
