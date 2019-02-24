@@ -4,6 +4,7 @@ const { jwtGen } = require('../utils')
 
 const UserSchema = new mongoose.Schema(
   {
+    name: String,
     email: {
       type: String,
       trim: true,
@@ -30,6 +31,7 @@ UserSchema.methods.validatePassword = function (password) {
 
 UserSchema.methods.generateJWT = function () {
   return jwtGen({
+    name: this.name,
     email: this.email,
     id: this._id,
     role: this.role
@@ -39,6 +41,7 @@ UserSchema.methods.generateJWT = function () {
 UserSchema.methods.toAuthJSON = function () {
   return {
     _id: this._id,
+    name: this.name,
     email: this.email,
     token: this.generateJWT()
   }

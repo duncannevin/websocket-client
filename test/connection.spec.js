@@ -31,6 +31,10 @@ function connectionSpec () {
       })
   })
 
+  after(() => {
+    connectionDAO.deleteConnection({connectionId: chai.connection._id})
+  })
+
   it('should not add un-authenticated connection to database', (done) => {
     chai.request(app)
       .post(createConnectionRoute)

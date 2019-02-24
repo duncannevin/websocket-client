@@ -1,5 +1,5 @@
 const chai = require('chai')
-const {expect} = chai
+const { expect } = chai
 const chaiHttp = require('chai-http')
 const app = require('../server/app')
 const jwt = require('jsonwebtoken')
@@ -10,9 +10,9 @@ const userForm = {
   password: 'PASSWORD'
 }
 
-const {regRoute, loginRoute} = {regRoute: '/auth/register', loginRoute: '/auth/login'}
+const { regRoute, loginRoute } = { regRoute: '/auth/register', loginRoute: '/auth/login' }
 
-function authSpec() {
+function authSpec () {
   it('should return 201 when a new user is added', (done) => {
     chai.request(app)
       .post(regRoute)
@@ -60,7 +60,7 @@ function authSpec() {
   it('should return 401 unauthorized with bad credentials', (done) => {
     chai.request(app)
       .post(loginRoute)
-      .send(Object.assign(userForm, {password: 'notit'}))
+      .send(Object.assign(userForm, { password: 'notit' }))
       .end((err, res) => {
         if (err) return console.log(err)
         res.should.have.status(401)

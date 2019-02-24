@@ -4,6 +4,7 @@ const {optional, required} = require('./auth')
 const authControl = require('../controllers/auth.control')
 const passport = require('passport')
 
+authRouter.post('/exists', optional, authControl.emailExists)
 authRouter.post('/register', optional, authControl.register)
 authRouter.post('/login', optional, authControl.login)
 authRouter.get('/github', optional, passport.authenticate('github', {session: false}))

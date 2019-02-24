@@ -3,8 +3,10 @@ import Vue from 'vue'
 import Ws from '../services/Ws'
 import { formatResponse, makeResizable } from '../utils'
 import axios from 'axios'
+import { $root } from '../main'
 
 const connectionPath = '/connection'
+const authPath = '/auth'
 
 Vue.use(Vuex)
 
@@ -12,11 +14,13 @@ export default new Vuex.Store({
   state: {
     connections: [],
     authenticated: false,
+    user: {},
     connectionTab: 0,
     bodiesTab: 0,
     responsesTab: 0,
     queuedNextAction: () => {},
-    messages: []
+    messages: [],
+    authMessages: []
   },
   mutations: {
     PUSH_RESPONSE (state, { connectionId, bodyId, lang, wsSent, wsResponse }) {
@@ -117,6 +121,22 @@ export default new Vuex.Store({
           .catch(console.error)
       })
     },
+    LOCAL_REGISTER (state, {name, email, password}) {
+      axios.post(authPath + '/register', {name, email, password})
+        .then(({data: {user}}) => {
+          state.authMessages = [{msg: 'Success!', level: 'success'}]
+          localStorage.setItem('Token', user.token)
+          state.authenticated = true
+          state.user = user
+          setTimeout(() => {
+            $root.$emit('bv::hide::modal', 'Auth')
+          }, 1000)
+        })
+        .catch(() => {
+          state.authMessages = [{msg: 'Auth failed', level: 'failed'}]
+        })
+    },
+    SOCIAL_AUTH (state) {},
     SET_CONNECTION_TAB (state, index) {
       state.connectionTab = index
     },
@@ -135,6 +155,12 @@ export default new Vuex.Store({
     },
     REMOVE_MESSAGE (state, { id }) {
       state.messages = state.messages.filter((m) => m.id !== id)
+    },
+    PUSH_AUTH_MESSAGE (state, { msg, level }) {
+      state.authMessages.push({ msg, level })
+    },
+    CLEAR_AUTH_MESSAGES (state) {
+      state.authMessages = []
     }
   },
   actions: {
@@ -162,6 +188,9 @@ export default new Vuex.Store({
     removeResponse ({ commit }, { responseId, contentId }) {
       commit('REMOVE_RESPONSE', { responseId, contentId })
     },
+    localRegister ({ commit }, { name, email, password }) {
+      commit('LOCAL_REGISTER', { name, email, password })
+    },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)
     },
@@ -179,6 +208,12 @@ export default new Vuex.Store({
     },
     removeMessage ({ commit }, { id }) {
       commit('REMOVE_MESSAGE', { id })
+    },
+    pushAuthMessage ({ commit }, { msg, level }) {
+      commit('PUSH_AUTH_MESSAGE', { msg, level })
+    },
+    clearAuthMessages ({commit}) {
+      commit('CLEAR_AUTH_MESSAGES')
     }
   },
   getters: {
@@ -188,6 +223,8 @@ export default new Vuex.Store({
     getBodiesTab: state => state.bodiesTab,
     getResponsesTab: state => state.responsesTab,
     getQueuedNext: state => state.queuedNextAction,
-    getMessages: state => state.messages
+    getMessages: state => state.messages,
+    getAuthMessages: state => state.authMessages,
+    getUser: state => state.user
   }
 })
