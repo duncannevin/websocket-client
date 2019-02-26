@@ -23,13 +23,12 @@ class ConnectionDAO {
   }
 
   /**
-   * @param userId
-   * @param name
-   * @param url
+   * @param userId {String}
+   * @param connectionData {object}
    * @return {Promise<*>}
    */
-  async saveConnection ({ userId, name, url }) {
-    const connection = new ConnectionRepository({ userId, name, url })
+  async saveConnection (userId, connectionData) {
+    const connection = new ConnectionRepository(Object.assign({userId}, connectionData))
     await connection.save()
     return connection
   }

@@ -3,7 +3,6 @@
   <b-col>
     <b-tabs
       :no-key-nav="true"
-      v-model="activeTab"
     >
       <b-tab
         v-for="(tab, ind) in bodies"

@@ -4,6 +4,20 @@ const connectionLogger = getLogger('connection')
 const uId = require('uniqid')
 
 class ConnectionControl {
+  async saveConnections (req, res, next) {
+    try {
+      const { id } = req.payload
+      const { connections } = req.body
+      const preparedConnections = Promise.all(connections.map(async (connection) => {
+        delete connection._id
+        return await connectionDAO.saveConnection(id, connection)
+      }))
+      res.status(201).send({ connections: preparedConnections })
+    } catch (error) {
+      res.status(400).send({ msg: error.message, code: 400 })
+    }
+  }
+
   async removeConnection (req, res, next) {
     try {
       const { connectionId } = req.params
@@ -42,7 +56,7 @@ class ConnectionControl {
       let connection
       if (req.hasOwnProperty('payload')) {
         const { id } = req.payload
-        connection = await connectionDAO.saveConnection({ userId: id, name, url })
+        connection = await connectionDAO.saveConnection(id, { name, url })
       } else {
         connection = connectionDAO.getUnauthorizedConnection({ name, url })
         connection._id = uId(24)
@@ -78,7 +92,7 @@ class ConnectionControl {
   async updateResponseContents (req, res, next) {
     try {
       const { connectionId, responseId, wsResponse } = req.body
-      let newResponse;
+      let newResponse
       if (req.hasOwnProperty('payload')) {
         newResponse = await connectionDAO.updateResponseContents({ connectionId, responseId, wsResponse })
       } else {

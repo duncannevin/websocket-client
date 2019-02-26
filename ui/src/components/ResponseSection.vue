@@ -13,7 +13,6 @@
             <b-tab
               v-for="(response, rInd) in responses"
               :key="'response-tab-' + rInd"
-              @click="activeTab = rInd"
             >
               <template slot="title">
                 <span class="tab-name">{{response.bodyName}}</span>
@@ -86,7 +85,7 @@ export default {
         return this.$store.getters.getResponsesTab
       },
       set (index) {
-        return this.$store.dispatch('setResponsesTab', index)
+        this.$store.dispatch('setResponsesTab', index)
       }
     }
   },

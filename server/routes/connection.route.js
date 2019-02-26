@@ -6,6 +6,7 @@ const connectionControl = require('../controllers/connection.control')
 connectionRouter.post('/create_connection', optional, connectionControl.createConnection)
 connectionRouter.post('/create_body', optional, connectionControl.createWsBody)
 connectionRouter.post('/create_cookie', optional, connectionControl.saveCookie)
+connectionRouter.post('/save_connections', required, connectionControl.saveConnections)
 
 connectionRouter.put('/update_response', optional, connectionControl.updateResponseContents)
 connectionRouter.put('/remove_cookie', optional, connectionControl.removeCookie)
