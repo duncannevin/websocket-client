@@ -9,9 +9,19 @@ class ConnectionControl {
       const { id } = req.payload
       const { connections } = req.body
       const preparedConnections = Promise.all(connections.map(async (connection) => {
+        connection.userId = id
+        connection.bodies = connection.bodies.map((b) => {
+          delete b._id
+          return b
+        })
+        connection.responses = connection.responses.map((r) => {
+          delete r._id
+          return r
+        })
         delete connection._id
         return await connectionDAO.saveConnection(id, connection)
       }))
+      console.log(preparedConnections)
       res.status(201).send({ connections: preparedConnections })
     } catch (error) {
       res.status(400).send({ msg: error.message, code: 400 })

@@ -7,6 +7,7 @@
       <b-tab
         v-for="(tab, ind) in bodies"
         :key="'bodies-tab-' + ind"
+        :active="activeTab === ind"
         @click="activeTab = ind"
       >
         <template slot="title">

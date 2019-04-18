@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Ws from '../services/Ws'
 import { formatResponse, makeResizable } from '../utils'
 import axios from 'axios'
-// import { $root } from '../main'
+import { $root } from '../main'
 
 const connectionPath = '/connection'
 const authPath = '/auth'
@@ -129,18 +129,16 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         axios.post(authPath + '/register', { name, email, password })
           .then(({ data: { user } }) => {
-            axios.post(authPath + '/save_connections', { connections: state.connections }, { headers: { Authorization: 'Token ' + user.token } })
+            axios.post(connectionPath + '/save_connections', { connections: state.connections }, { headers: { Authorization: 'Token ' + user.token } })
               .then(({ data: { connections } }) => {
-                console.log(connections)
-
-                // state.authMessages = [{msg: 'Success!', level: 'success'}]
-                // localStorage.setItem('Token', user.token)
-                // state.authenticated = true
-                // state.user = user
-                // setTimeout(() => {
-                //   $root.$emit('bv::hide::modal', 'Auth')
-                // }, 1000)
-                // resolve()
+                state.authMessages = [{msg: 'Success!', level: 'success'}]
+                localStorage.setItem('Token', user.token)
+                state.authenticated = true
+                state.user = user
+                setTimeout(() => {
+                  $root.$emit('bv::hide::modal', 'Auth')
+                }, 1000)
+                resolve()
               })
               .catch(console.error)
           })
