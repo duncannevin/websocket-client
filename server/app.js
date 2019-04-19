@@ -11,6 +11,7 @@ const router = require('./routes')
 const passport = require('passport')
 const expressValidator = require('express-validator')
 const app = express()
+const cors = require('cors')
 
 // Set environment variables
 dotenv.config()
@@ -34,6 +35,7 @@ app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(cors())
 
 // serve ui
 app.use(express.static(path.join(__dirname, '../public')))

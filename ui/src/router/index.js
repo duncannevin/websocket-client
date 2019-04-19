@@ -6,6 +6,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowAltCircleDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import vuelidate from 'vuelidate'
+import SocialRedirect from '../components/SocialRedirect'
 
 require('jquery-ui-dist/jquery-ui.css')
 require('jquery-ui-dist/jquery-ui')
@@ -23,6 +24,11 @@ export default new Router({
       path: '/',
       name: 'Connections',
       component: Connections
+    },
+    {
+      path: '/socialredirect',
+      name: 'SocialRedirect',
+      component: SocialRedirect
     }
   ]
 })

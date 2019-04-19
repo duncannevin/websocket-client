@@ -47,8 +47,10 @@
         <br>
       </b-row>
       <b-btn class="mt-3" variant="outline-success" block>
+        <a href="/auth/github">
         <i class="fab fa-github"></i>
         {{mode.split('_').join(' ').toUpperCase()}} WITH GITHUB
+        </a>
       </b-btn>
       <b-row style="margin-top: 2rem;">
         <a href="#" @click="mode = mode === 'sign_up' ? 'sign_in' : 'sign_up'">
@@ -136,6 +138,9 @@ export default {
     },
     signIn () {
       console.log('sign in')
+    },
+    signInSocial () {
+      this.$store.dispatch('socialAuth')
     },
     closeAuth () {
       this.$root.$emit('bv::hide::modal', 'Auth')

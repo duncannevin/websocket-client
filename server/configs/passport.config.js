@@ -1,25 +1,30 @@
 const GitHubStrategy = require('passport-github2')
 const GoogleStrategy = require('passport-google-oauth2')
 const LocalStrategy = require('passport-local')
-const {userDAO} = require('../daos')
+const { userDAO, socialDAO } = require('../daos')
 const authLogger = require('log4js').getLogger('auth')
-const {jwtGen} = require('../utils')
+const { jwtGen } = require('../utils')
 
-async function oauth2Callback(request, accessToken, refreshToken, profile, done) {
-  const user = {
-    _id: profile.id,
-    username: profile.username,
-    role: 'guest'
+async function oauth2Callback (request, accessToken, refreshToken, profile, done) {
+  try {
+    const user = {
+      socialId: profile.id,
+      email: profile.email,
+      username: profile.username,
+      role: 'guest'
+    }
+    const savedUser = await socialDAO.save(user)
+    done(null, savedUser)
+  } catch (error) {
+    done(error, null)
   }
-  const jwt = {jwt: jwtGen(user)}
-  done(null, Object.assign(user, jwt))
 }
 
-async function localAuthCallback(email, password, done) {
+async function localAuthCallback (email, password, done) {
   try {
     const user = await userDAO.findByEmail(email)
     if (!user || !user.validatePassword(password)) {
-      return done(null, false, {errors: {'email or password': 'is invalid'}})
+      return done(null, false, { errors: { 'email or password': 'is invalid' } })
     }
     return done(null, user)
   } catch (error) {
@@ -28,7 +33,7 @@ async function localAuthCallback(email, password, done) {
   }
 }
 
-function config(passport) {
+function config (passport) {
   /**
    * @description Local auth
    */
@@ -43,7 +48,7 @@ function config(passport) {
   passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: 'http://localhost:3000/auth/github/callback'
+    callbackURL: 'http://localhost:8080/auth/github/callback'
   }, oauth2Callback))
 
   passport.serializeUser(function (user, done) {

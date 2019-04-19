@@ -1,8 +1,9 @@
 const { validateLogin } = require('../utils/req_validators.util')
-const userDAO = require('../daos/user.dao')
+const { socialDAO, userDAO } = require('../daos')
 const { getLogger } = require('log4js')
 const authLogger = getLogger('auth')
 const passport = require('passport')
+const { Types, ObjectId } = require('mongoose')
 
 class AuthControl {
   async emailExists (req, res, next) {
@@ -50,9 +51,9 @@ class AuthControl {
     })(req, res, next)
   }
 
-  handleSocial (req, res, next) {
+  async handleSocial (req, res, next) {
     if (!req.hasOwnProperty('user')) return res.status(400).send({ msg: 'No user field provided', code: 400 })
-    res.status(200).send(req.user)
+    res.redirect('/#/socialredirect?userid=' + req.user._id)
   }
 }
 

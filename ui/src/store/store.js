@@ -7,8 +7,29 @@ import { $root } from '../main'
 
 const connectionPath = '/connection'
 const authPath = '/auth'
+const userPath = '/users'
 
 Vue.use(Vuex)
+
+function saveConnections ({ user }, state) {
+  return new Promise((resolve) => {
+    axios.post(connectionPath + '/save_connections', { connections: state.connections }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+      .then(({ data: { connections } }) => {
+        state.connections = connections.map((connection) => {
+          return Object.assign(connection, { ws: new Ws(connection) })
+        })
+        state.authMessages = [{ msg: 'Success!', level: 'success' }]
+        localStorage.setItem('Token', user.token)
+        state.authenticated = true
+        state.user = user
+        setTimeout(() => {
+          $root.$emit('bv::hide::modal', 'Auth')
+        }, 1000)
+        resolve()
+      })
+      .catch(console.error)
+  })
+}
 
 export default new Vuex.Store({
   state: {
@@ -57,6 +78,7 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         axios.post(connectionPath + '/create_body', { connectionId, name, lang })
           .then(({ data: { wsBody, wsResponse } }) => {
+            console.log(wsBody, wsResponse)
             state.connections[state.connectionTab].bodies.push(wsBody)
             state.connections[state.connectionTab].responses.push(wsResponse)
             setTimeout(() => {
@@ -128,26 +150,27 @@ export default new Vuex.Store({
     LOCAL_REGISTER (state, { name, email, password }) {
       return new Promise((resolve) => {
         axios.post(authPath + '/register', { name, email, password })
-          .then(({ data: { user } }) => {
-            axios.post(connectionPath + '/save_connections', { connections: state.connections }, { headers: { Authorization: 'Token ' + user.token } })
-              .then(({ data: { connections } }) => {
-                state.authMessages = [{msg: 'Success!', level: 'success'}]
-                localStorage.setItem('Token', user.token)
-                state.authenticated = true
-                state.user = user
-                setTimeout(() => {
-                  $root.$emit('bv::hide::modal', 'Auth')
-                }, 1000)
-                resolve()
-              })
-              .catch(console.error)
+          .then(async ({ data: { user } }) => {
+            await saveConnections({ user }, state)
+            resolve()
           })
           .catch(() => {
             state.authMessages = [{ msg: 'Auth failed', level: 'failed' }]
           })
       })
     },
-    SOCIAL_AUTH (state) {},
+    SOCIAL_AUTH (state, { userId }) {
+      return new Promise((resolve) => {
+        axios.get(userPath + '/get_social', { params: { userId } })
+          .then(async ({ data: { user } }) => {
+            await saveConnections({ user }, state)
+            resolve()
+          })
+          .catch(() => {
+            state.authMessages = [{ msg: 'Auth failed', level: 'failed' }]
+          })
+      })
+    },
     SET_CONNECTION_TAB (state, index) {
       state.connectionTab = index
     },
@@ -201,6 +224,9 @@ export default new Vuex.Store({
     },
     localRegister ({ commit }, { name, email, password }) {
       commit('LOCAL_REGISTER', { name, email, password })
+    },
+    socialAuth ({ commit }, { userId }) {
+      commit('SOCIAL_AUTH', { userId })
     },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)

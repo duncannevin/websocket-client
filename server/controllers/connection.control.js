@@ -1,27 +1,26 @@
 const { connectionDAO } = require('../daos')
 const { getLogger } = require('log4js')
 const connectionLogger = getLogger('connection')
-const uId = require('uniqid')
+const { Types, ObjectId } = require('mongoose')
 
 class ConnectionControl {
   async saveConnections (req, res, next) {
     try {
       const { id } = req.payload
       const { connections } = req.body
-      const preparedConnections = Promise.all(connections.map(async (connection) => {
+      const preparedConnections = await Promise.all(connections.map(async (connection) => {
         connection.userId = id
-        connection.bodies = connection.bodies.map((b) => {
-          delete b._id
-          return b
+        connection.bodies = connection.bodies.map((body) => {
+          body._id = Types.ObjectId(body._id)
+          return body
         })
-        connection.responses = connection.responses.map((r) => {
-          delete r._id
-          return r
+        connection.responses = connection.responses.map((response) => {
+          response._id = Types.ObjectId(response._id)
+          return response
         })
-        delete connection._id
+        connection._id = Types.ObjectId(connection._id)
         return await connectionDAO.saveConnection(id, connection)
       }))
-      console.log(preparedConnections)
       res.status(201).send({ connections: preparedConnections })
     } catch (error) {
       res.status(400).send({ msg: error.message, code: 400 })
@@ -69,7 +68,6 @@ class ConnectionControl {
         connection = await connectionDAO.saveConnection(id, { name, url })
       } else {
         connection = connectionDAO.getUnauthorizedConnection({ name, url })
-        connection._id = uId(24)
       }
       res.status(201).send(connection)
     } catch (error) {
@@ -88,9 +86,9 @@ class ConnectionControl {
         wsResponse.bodyId = wsBody._id
         wsResponse = await connectionDAO.saveResponse({ connectionId, wsResponse })
       } else {
-        wsBody._id = uId(24)
+        wsBody._id = Types.ObjectId()
         wsResponse.bodyId = wsBody._id
-        wsResponse._id = uId(24)
+        wsResponse._id = Types.ObjectId()
       }
       res.status(201).send({ wsBody, wsResponse })
     } catch (error) {
@@ -106,7 +104,7 @@ class ConnectionControl {
       if (req.hasOwnProperty('payload')) {
         newResponse = await connectionDAO.updateResponseContents({ connectionId, responseId, wsResponse })
       } else {
-        newResponse = Object.assign(wsResponse, { _id: uId(24) })
+        newResponse = Object.assign(wsResponse, { _id: Types.ObjectId() })
       }
       res.status(201).send({ wsResponse: newResponse })
     } catch (error) {
