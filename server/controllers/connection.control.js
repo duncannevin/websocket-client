@@ -108,6 +108,7 @@ class ConnectionControl {
       }
       res.status(201).send({ wsResponse: newResponse })
     } catch (error) {
+      connectionLogger.debug('[updateResponseContents]', error)
       res.status(400).send({ msg: error.message, code: 400 })
     }
   }

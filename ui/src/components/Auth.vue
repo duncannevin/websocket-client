@@ -24,18 +24,18 @@
         <b-col sm="3"><label for="Auth-email">email:</label></b-col>
         <b-col sm="9" :class="{ 'form-group--error': $v.form.email.$error, 'form-group--loading': $v.form.email.$pending }">
           <b-form-input id="Auth-email" size="sm" type="text" v-model.trim="$v.form.email.$model"></b-form-input>
-          <div class="error" v-if="!$v.form.email.required">Required field.</div>
-          <div class="error" v-if="!$v.form.email.email">Must be a valid email.</div>
-          <div class="error" v-if="!$v.form.email.isUnique">This email is already registered.</div>
+          <div class="error" v-if="mode === 'sign_up' && !$v.form.email.required">Required field.</div>
+          <div class="error" v-if="mode === 'sign_up' && !$v.form.email.email">Must be a valid email.</div>
+          <div class="error" v-if="mode === 'sign_up' && !$v.form.email.isUnique">This email is already registered.</div>
         </b-col>
       </b-row>
       <b-row class="my-1">
         <b-col sm="3"><label for="Auth-password">password:</label></b-col>
         <b-col sm="9">
           <b-form-input id="Auth-password" :class="{ 'form-group--error': $v.form.email.$error, 'form-group--loading': $v.form.email.$pending } " size="sm" type="password" v-model.trim="$v.form.password.$model"></b-form-input>
-          <div class="error" v-if="!$v.form.password.required">Required field.</div>
-          <div class="error" v-if="!$v.form.password.minLength">Must be {{$v.form.password.$params.minLength.min}} characters long.</div>
-          <div class="error" v-if="form.password.length && (!$v.form.password.containsNumber || !$v.form.password.containsSymbol)">Must contain 1 letter and symbol.</div>
+          <div class="error" v-if="mode === 'sign_up' && !$v.form.password.required">Required field.</div>
+          <div class="error" v-if="mode === 'sign_up' && !$v.form.password.minLength">Must be {{$v.form.password.$params.minLength.min}} characters long.</div>
+          <div class="error" v-if="mode === 'sign_up' && form.password.length && (!$v.form.password.containsNumber || !$v.form.password.containsSymbol)">Must contain 1 letter and symbol.</div>
         </b-col>
       </b-row>
       <b-row class="my-1">
@@ -128,18 +128,21 @@ export default {
     _cacheConnections () {
       localStorage.setItem('connections-cache', JSON.stringify(this.$store.getters.getConnections))
     },
-    signUp () {
+    async signUp () {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this._cacheConnections()
         this.$store.dispatch('pushAuthMessage', { msg: 'Pending', level: 'pending' })
-        this.$store.dispatch('localRegister', Object.assign({}, this.form))
+        await this.$store.dispatch('localRegister', Object.assign({}, this.form))
+        this.closeAuth()
       } else {
         this.$store.dispatch('pushAuthMessage', { msg: 'Form invalid', level: 'warn' })
       }
     },
-    signIn () {
-      console.log('sign in')
+    async signIn () {
+      this.$store.dispatch('pushAuthMessage', { msg: 'Pending', level: 'pending' })
+      await this.$store.dispatch('signIn', Object.assign({}, this.form))
+      this.closeAuth()
     },
     signInSocial () {
       this._cacheConnections()

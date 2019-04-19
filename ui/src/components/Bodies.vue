@@ -55,6 +55,9 @@ import AceEditor from 'vue2-ace-editor'
 export default {
   name: 'Bodies',
   computed: {
+    authenticated () {
+      return this.$store.getters.getAuthenticated
+    },
     activeTab: {
       get () {
         return this.$store.getters.getBodiesTab
@@ -102,7 +105,7 @@ export default {
   components: {
     AceEditor
   },
-  props: ['bodies', 'responses', 'ws', 'authenticated']
+  props: ['bodies', 'responses', 'ws']
 }
 </script>
 

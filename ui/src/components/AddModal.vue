@@ -35,7 +35,7 @@ export default {
       return this.$store.getters.getConnectionTab
     },
     currentConnectionId () {
-      return this.$store.getters.getConnections[this.connectionTabInd]
+      return this.$store.getters.getConnections[this.connectionTabInd]._id
     }
   },
   data () {

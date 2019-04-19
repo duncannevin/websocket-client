@@ -1,4 +1,4 @@
-const {UserRepository} = require('../schemas')
+const { UserRepository } = require('../schemas')
 
 class UserDAO {
   /**
@@ -6,8 +6,12 @@ class UserDAO {
    * @param email
    * @returns {Promise<user.model>}
    */
-  async findByEmail(email) {
-    return await UserRepository.findOne({email: email})
+  async findByEmail (email) {
+    return await UserRepository.findOne({ email: email })
+  }
+
+  async find (id) {
+    return await UserRepository.findOne({ _id: id })
   }
 
   /**
@@ -15,7 +19,7 @@ class UserDAO {
    * @param user
    * @returns {Promise<user>}
    */
-  async save(user) {
+  async save (user) {
     const newUser = new UserRepository(user)
     newUser.setPassword(user.password)
     await newUser.save()
@@ -26,7 +30,7 @@ class UserDAO {
    * @description Fetches all users from the storage
    * @returns {Promise<user.model[]>}
    */
-  async findAll() {
+  async findAll () {
     return await UserRepository.find()
   }
 
@@ -35,8 +39,8 @@ class UserDAO {
    * @return {Promise<>}
    * @param email
    */
-  async deleteOne(email) {
-    return await UserRepository.deleteOne({email: email})
+  async deleteOne (email) {
+    return await UserRepository.deleteOne({ email: email })
   }
 }
 

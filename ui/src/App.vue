@@ -18,6 +18,7 @@ export default {
   name: 'App',
   mounted () {
     makeResizable()
+    this.$store.dispatch('init')
   },
   components: {
     Messages,

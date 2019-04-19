@@ -11,16 +11,19 @@ const userPath = '/users'
 
 Vue.use(Vuex)
 
+function processConnections ({ connections }) {
+  return connections.map((connection) => {
+    return Object.assign(connection, { ws: new Ws(connection) })
+  })
+}
+
 function saveConnections ({ user }, state) {
   const connections = JSON.parse(localStorage.getItem('connections-cache')) || []
   return new Promise((resolve) => {
     axios.post(connectionPath + '/save_connections', { connections: connections }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
       .then(({ data: { connections } }) => {
-        state.connections = connections.map((connection) => {
-          return Object.assign(connection, { ws: new Ws(connection) })
-        })
+        state.connections = processConnections({ connections })
         state.authMessages = [{ msg: 'Success!', level: 'success' }]
-        localStorage.setItem('Token', user.token)
         state.authenticated = true
         state.user = user
         setTimeout(() => {
@@ -46,6 +49,21 @@ export default new Vuex.Store({
     authMessages: []
   },
   mutations: {
+    INIT (state) {
+      const token = localStorage.getItem('Token')
+      return new Promise((resolve) => {
+        axios.post(authPath + '/login', {}, { headers: { Authorization: 'Token ' + token } })
+          .then(async ({ data: { user } }) => {
+            state.user = user
+            state.authenticated = true
+            localStorage.setItem('Token', user.token)
+            await this.dispatch('getConnections')
+            resolve()
+          })
+          .catch(() => {
+          })
+      })
+    },
     PUSH_RESPONSE (state, { connectionId, bodyId, lang, wsSent, wsResponse }) {
       const connection = state.connections.find((c) => c._id === connectionId)
       const response = connection.responses.find((r) => r.bodyId === bodyId)
@@ -55,7 +73,7 @@ export default new Vuex.Store({
           connectionId,
           responseId: response._id,
           wsResponse: newResponse
-        })
+        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
           .then(({ data: { wsResponse } }) => {
             response.contents.unshift(wsResponse)
             setTimeout(makeResizable, 200)
@@ -66,7 +84,10 @@ export default new Vuex.Store({
     },
     CREATE_CONNECTION (state, { name, url }) {
       return new Promise((resolve) => {
-        axios.post(connectionPath + '/create_connection', { name, url })
+        axios.post(connectionPath + '/create_connection', {
+          name,
+          url
+        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
           .then(({ data }) => {
             data.ws = new Ws(data)
             state.connections.push(data)
@@ -78,9 +99,12 @@ export default new Vuex.Store({
     },
     CREATE_BODY (state, { connectionId, name, lang }) {
       return new Promise((resolve) => {
-        axios.post(connectionPath + '/create_body', { connectionId, name, lang })
+        axios.post(connectionPath + '/create_body', {
+          connectionId,
+          name,
+          lang
+        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
           .then(({ data: { wsBody, wsResponse } }) => {
-            console.log(wsBody, wsResponse)
             state.connections[state.connectionTab].bodies.push(wsBody)
             state.connections[state.connectionTab].responses.push(wsResponse)
             setTimeout(() => {
@@ -95,7 +119,11 @@ export default new Vuex.Store({
     CREATE_COOKIE (state, { key, value }) {
       const connectionId = state.connections[state.connectionTab]._id
       return new Promise((resolve) => {
-        axios.post(connectionPath + '/create_cookie', { connectionId, key, value })
+        axios.post(connectionPath + '/create_cookie', {
+          connectionId,
+          key,
+          value
+        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
           .then(({ data: { key, value } }) => {
             if (state.connections[state.connectionTab].cookies.some((c) => c.key === key)) {
               state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.map((c) => {
@@ -113,7 +141,10 @@ export default new Vuex.Store({
     REMOVE_COOKIE (state, { key }) {
       const connectionId = state.connections[state.connectionTab]._id
       return new Promise((resolve) => {
-        axios.put(connectionPath + '/remove_cookie', { connectionId, key })
+        axios.put(connectionPath + '/remove_cookie', {
+          connectionId,
+          key
+        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
           .then(() => {
             state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.filter((c) => c.key !== key)
             resolve()
@@ -124,7 +155,10 @@ export default new Vuex.Store({
     REMOVE_BODY (state, { bodyId }) {
       const connectionId = state.connections[state.connectionTab]._id
       return new Promise((resolve) => {
-        axios.put(connectionPath + '/remove_body', { connectionId, bodyId })
+        axios.put(connectionPath + '/remove_body', {
+          connectionId,
+          bodyId
+        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
           .then(() => {
             state.connections[state.connectionTab].bodies = state.connections[state.connectionTab].bodies.filter((c) => c._id !== bodyId)
             state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.filter((c) => c.bodyId !== bodyId)
@@ -136,7 +170,11 @@ export default new Vuex.Store({
     REMOVE_RESPONSE (state, { responseId, contentId }) {
       const connectionId = state.connections[state.connectionTab]._id
       return new Promise((resolve) => {
-        axios.put(connectionPath + '/remove_response', { connectionId, responseId, contentId })
+        axios.put(connectionPath + '/remove_response', {
+          connectionId,
+          responseId,
+          contentId
+        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
           .then(() => {
             state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.map((res) => {
               if (res._id === responseId) {
@@ -154,6 +192,7 @@ export default new Vuex.Store({
         axios.post(authPath + '/register', { name, email, password })
           .then(async ({ data: { user } }) => {
             await saveConnections({ user }, state)
+            localStorage.setItem('Token', user.token)
             resolve()
           })
           .catch(() => {
@@ -165,12 +204,38 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         axios.get(userPath + '/get_social', { params: { userId } })
           .then(async ({ data: { user } }) => {
+            localStorage.setItem('Token', user.token)
             await saveConnections({ user }, state)
             resolve()
           })
           .catch(() => {
             state.authMessages = [{ msg: 'Auth failed', level: 'failed' }]
           })
+      })
+    },
+    SIGN_IN (state, { email, password }) {
+      return new Promise((resolve) => {
+        axios.post(authPath + '/login', { email, password })
+          .then(async ({ data: { user } }) => {
+            state.user = user
+            state.authenticated = true
+            localStorage.setItem('Token', user.token)
+            await this.dispatch('getConnections')
+            resolve()
+          })
+          .catch(() => {
+            state.authMessages = [{ msg: 'Auth failed', level: 'failed' }]
+          })
+      })
+    },
+    GET_CONNECTIONS (state) {
+      return new Promise((resolve) => {
+        axios.get(connectionPath + '/get_connections', { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
+          .then(({ data: { connections } }) => {
+            state.connections = processConnections({ connections })
+            resolve()
+          })
+          .catch(console.error)
       })
     },
     SET_CONNECTION_TAB (state, index) {
@@ -200,6 +265,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    init ({ commit }) {
+      commit('INIT')
+    },
     pushResponse ({ commit }, args) {
       commit('PUSH_RESPONSE', args)
     },
@@ -209,8 +277,8 @@ export default new Vuex.Store({
     createConnection ({ commit }, { name, url }) {
       commit('CREATE_CONNECTION', { name, url })
     },
-    createBody ({ commit }, { name, url }) {
-      commit('CREATE_BODY', { name, url })
+    createBody ({ commit }, { connectionId, name, url }) {
+      commit('CREATE_BODY', { connectionId, name, url })
     },
     createCookie ({ commit }, { key, value }) {
       commit('CREATE_COOKIE', { key, value })
@@ -229,6 +297,12 @@ export default new Vuex.Store({
     },
     socialAuth ({ commit }, { userId }) {
       commit('SOCIAL_AUTH', { userId })
+    },
+    signIn ({ commit }, { email, password }) {
+      commit('SIGN_IN', { email, password })
+    },
+    getConnections ({ commit }) {
+      commit('GET_CONNECTIONS')
     },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)

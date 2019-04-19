@@ -73,7 +73,7 @@ class ConnectionDAO {
       { $push: { 'responses.$.contents': wsResponse } },
       { new: true }
     )
-    return updated.responses.find((res) => res._id.toString() === responseId)[0].contents.slice(-1)
+    return updated.responses.find((res) => res._id.toString() === responseId).contents.slice(-1).pop()
   }
 
   async saveCookie ({ connectionId, key, value }) {

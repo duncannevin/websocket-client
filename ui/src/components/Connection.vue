@@ -11,8 +11,8 @@
       </b-input-group>
     </b-col>
   </b-row>
-  <request-section :connection="connection" :connection-name="connection.name" :authenticated="authenticated"></request-section>
-  <response-section :responses="connection.responses" :authenticated="authenticated"></response-section>
+  <request-section :connection="connection" :connection-name="connection.name"></request-section>
+  <response-section :responses="connection.responses"></response-section>
 </div>
 </template>
 

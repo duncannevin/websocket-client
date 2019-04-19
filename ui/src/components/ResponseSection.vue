@@ -120,7 +120,7 @@ export default {
   components: {
     AceEditor
   },
-  props: ['responses', 'authenticated']
+  props: ['responses']
 }
 </script>
 

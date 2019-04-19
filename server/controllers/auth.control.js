@@ -36,19 +36,29 @@ class AuthControl {
     }
   }
 
-  login (req, res, next) {
-    const validationErrors = validateLogin(req)
-    if (validationErrors) {
-      return res.status(422).send({ msg: validationErrors, code: 422 })
-    }
-    return passport.authenticate('local', { session: false }, (err, passportUser, info) => {
-      if (err) return next(err)
-      if (passportUser) {
-        passportUser.generateJWT()
-        return res.status(200).send({ user: passportUser.toAuthJSON() })
+  async login (req, res, next) {
+    if (req.hasOwnProperty('payload')) {
+      try {
+        const { id } = req.payload
+        const user = await userDAO.find(id)
+        res.status(200).send({ user: user.toAuthJSON() })
+      } catch (error) {
+        res.status(401).send({msg: 'Unauthorized', code: 401})
       }
-      return res.status(401).send({ msg: 'Unauthorized', code: 401 })
-    })(req, res, next)
+    } else {
+      const validationErrors = validateLogin(req)
+      if (validationErrors) {
+        return res.status(422).send({ msg: validationErrors, code: 422 })
+      }
+      return passport.authenticate('local', { session: false }, (err, passportUser, info) => {
+        if (err) return next(err)
+        if (passportUser) {
+          passportUser.generateJWT()
+          return res.status(200).send({ user: passportUser.toAuthJSON() })
+        }
+        return res.status(401).send({ msg: 'Unauthorized', code: 401 })
+      })(req, res, next)
+    }
   }
 
   async handleSocial (req, res, next) {
