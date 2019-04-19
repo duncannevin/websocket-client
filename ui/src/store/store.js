@@ -12,8 +12,9 @@ const userPath = '/users'
 Vue.use(Vuex)
 
 function saveConnections ({ user }, state) {
+  const connections = JSON.parse(localStorage.getItem('connections-cache')) || []
   return new Promise((resolve) => {
-    axios.post(connectionPath + '/save_connections', { connections: state.connections }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+    axios.post(connectionPath + '/save_connections', { connections: connections }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
       .then(({ data: { connections } }) => {
         state.connections = connections.map((connection) => {
           return Object.assign(connection, { ws: new Ws(connection) })
@@ -25,6 +26,7 @@ function saveConnections ({ user }, state) {
         setTimeout(() => {
           $root.$emit('bv::hide::modal', 'Auth')
         }, 1000)
+        localStorage.removeItem('connections-cache')
         resolve()
       })
       .catch(console.error)
