@@ -238,6 +238,18 @@ export default new Vuex.Store({
           .catch(console.error)
       })
     },
+    LOGOUT (state) {
+      localStorage.clear()
+      state.connections = []
+      state.authenticated = false
+      state.user = {}
+      state.connectionTab = 0
+      state.bodiesTab = 0
+      state.responsesTab = 0
+      state.queuedNextAction = () => {}
+      state.messages = []
+      state.authMessages = []
+    },
     SET_CONNECTION_TAB (state, index) {
       state.connectionTab = index
     },
@@ -300,6 +312,9 @@ export default new Vuex.Store({
     },
     signIn ({ commit }, { email, password }) {
       commit('SIGN_IN', { email, password })
+    },
+    logout ({ commit }) {
+      commit('LOGOUT')
     },
     getConnections ({ commit }) {
       commit('GET_CONNECTIONS')

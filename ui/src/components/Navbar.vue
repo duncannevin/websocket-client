@@ -3,7 +3,7 @@
     <b-navbar-brand href="#">Awesome Websocket Client</b-navbar-brand>
     <b-navbar-nav class="ml-auto">
       <b-nav-item v-if="!authenticated" @click="openAuth">Sign In</b-nav-item>
-      <b-nav-item v-else>Sign Out</b-nav-item>
+      <b-nav-item v-else @click="logout">Sign Out</b-nav-item>
     </b-navbar-nav>
 </b-navbar>
 </template>
@@ -22,6 +22,10 @@ export default {
   methods: {
     openAuth () {
       this.$root.$emit('bv::show::modal', 'Auth')
+    },
+    logout () {
+      this.$store.dispatch('logout')
+      this.$router.push({ path: '/' })
     }
   }
 }
