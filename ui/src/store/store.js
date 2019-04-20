@@ -30,6 +30,7 @@ function saveConnections ({ user }, state) {
         state.user = user
         setTimeout(() => {
           $root.$emit('bv::hide::modal', 'Auth')
+          makeResizable()
         }, 1000)
         localStorage.removeItem('connections-cache')
         resolve()

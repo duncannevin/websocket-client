@@ -22,7 +22,7 @@
                   Waiting for a response<span class="loader-dot">.</span><span class="loader-dot">.</span><span class="loader-dot">.</span>
                 </div>
               </b-row>
-              <b-col v-else>
+              <b-col class="responses-container" v-else>
                 <b-row
                   v-for="(content, cInd) in response.contents"
                   :key="'response-content-' + cInd"
@@ -130,7 +130,7 @@ export default {
 .responses-section
   .tabs
     width: 100%
-.col
+.responses-container
   .response-editor
     position: relative
     overflow: hidden

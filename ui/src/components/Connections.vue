@@ -70,7 +70,7 @@ export default {
       this.$store.dispatch('removeConnection', { connectionId })
     },
     renameConnection (evt, ind) {
-      console.log('RENAME CONNECTION', ind)
+      // todo -> implement in server
     }
   },
   components: {
