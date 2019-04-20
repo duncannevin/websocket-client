@@ -77,6 +77,9 @@ export default {
     },
     authMessages () {
       return this.$store.getters.getAuthMessages
+    },
+    authenticated () {
+      return this.$store.getters.getAuthenticated
     }
   },
   data () {
@@ -134,7 +137,9 @@ export default {
         this._cacheConnections()
         this.$store.dispatch('pushAuthMessage', { msg: 'Pending', level: 'pending' })
         await this.$store.dispatch('localRegister', Object.assign({}, this.form))
-        this.closeAuth()
+        if (this.authenticated) {
+          this.closeAuth()
+        }
       } else {
         this.$store.dispatch('pushAuthMessage', { msg: 'Form invalid', level: 'warn' })
       }
@@ -142,7 +147,10 @@ export default {
     async signIn () {
       this.$store.dispatch('pushAuthMessage', { msg: 'Pending', level: 'pending' })
       await this.$store.dispatch('signIn', Object.assign({}, this.form))
-      this.closeAuth()
+      console.log(this.authenticated)
+      if (this.authenticated) {
+        this.closeAuth()
+      }
     },
     signInSocial () {
       this._cacheConnections()

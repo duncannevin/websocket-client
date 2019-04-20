@@ -37,15 +37,33 @@ class AuthControl {
   }
 
   async login (req, res, next) {
+    /**
+     * if JSON token is valid
+     */
     if (req.hasOwnProperty('payload')) {
       try {
+        /**
+         * if local auth
+         */
         const { id } = req.payload
         const user = await userDAO.find(id)
         res.status(200).send({ user: user.toAuthJSON() })
       } catch (error) {
-        res.status(401).send({msg: 'Unauthorized', code: 401})
+        try {
+          /**
+           * if social auth
+           */
+          const { id } = req.payload
+          const user = await socialDAO.find(id)
+          res.status(200).send({ user: user })
+        } catch (error) {
+          res.status(401).send({msg: 'Unauthorized', code: 401})
+        }
       }
     } else {
+      /**
+       * if signing in with credentials
+       */
       const validationErrors = validateLogin(req)
       if (validationErrors) {
         return res.status(422).send({ msg: validationErrors, code: 422 })

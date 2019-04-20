@@ -18,7 +18,7 @@ const SocialSchema = new mongoose.Schema(
 
 SocialSchema.methods.generateJWT = function () {
   return jwtGen({
-    username: this.username,
+    name: this.username,
     email: this.email,
     id: this._id,
     role: this.role,
@@ -29,7 +29,7 @@ SocialSchema.methods.generateJWT = function () {
 SocialSchema.methods.toAuthJSON = function () {
   return {
     _id: this._id,
-    username: this.username,
+    name: this.username,
     email: this.email,
     socialId: this.socialId,
     token: this.generateJWT()

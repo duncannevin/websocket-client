@@ -4,6 +4,7 @@ import Ws from '../services/Ws'
 import { formatResponse, makeResizable } from '../utils'
 import axios from 'axios'
 import { $root } from '../main'
+import { Message } from '../services/Message'
 
 const connectionPath = '/connection'
 const authPath = '/auth'
@@ -49,194 +50,60 @@ export default new Vuex.Store({
     authMessages: []
   },
   mutations: {
-    INIT (state) {
-      const token = localStorage.getItem('Token')
-      return new Promise((resolve) => {
-        axios.post(authPath + '/login', {}, { headers: { Authorization: 'Token ' + token } })
-          .then(async ({ data: { user } }) => {
-            state.user = user
-            state.authenticated = true
-            localStorage.setItem('Token', user.token)
-            await this.dispatch('getConnections')
-            resolve()
-          })
-          .catch(() => {
-          })
-      })
+    PUSH_RESPONSE (state, { wsResponse, response }) {
+      response.contents.unshift(wsResponse)
+      setTimeout(makeResizable, 200)
     },
-    PUSH_RESPONSE (state, { connectionId, bodyId, lang, wsSent, wsResponse }) {
-      const connection = state.connections.find((c) => c._id === connectionId)
-      const response = connection.responses.find((r) => r.bodyId === bodyId)
-      const newResponse = { lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) }
-      return new Promise((resolve) => {
-        axios.put(connectionPath + '/update_response', {
-          connectionId,
-          responseId: response._id,
-          wsResponse: newResponse
-        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(({ data: { wsResponse } }) => {
-            response.contents.unshift(wsResponse)
-            setTimeout(makeResizable, 200)
-            resolve()
-          })
-          .catch(console.error)
-      })
+    CREATE_CONNECTION (state, { data }) {
+      data.ws = new Ws(data)
+      state.connections.push(data)
+      state.connectionTab = state.connections.length - 1
     },
-    CREATE_CONNECTION (state, { name, url }) {
-      return new Promise((resolve) => {
-        axios.post(connectionPath + '/create_connection', {
-          name,
-          url
-        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(({ data }) => {
-            data.ws = new Ws(data)
-            state.connections.push(data)
-            state.connectionTab = state.connections.length - 1
-            resolve()
-          })
-          .catch(console.error)
-      })
-    },
-    CREATE_BODY (state, { connectionId, name, lang }) {
-      return new Promise((resolve) => {
-        axios.post(connectionPath + '/create_body', {
-          connectionId,
-          name,
-          lang
-        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(({ data: { wsBody, wsResponse } }) => {
-            state.connections[state.connectionTab].bodies.push(wsBody)
-            state.connections[state.connectionTab].responses.push(wsResponse)
-            setTimeout(() => {
-              state.bodiesTab = state.connections[state.connectionTab].bodies.length - 1
-              state.responsesTab = state.connections[state.connectionTab].responses.length - 1
-            }, 80)
-            resolve()
-          })
-          .catch(console.error)
-      })
+    CREATE_BODY (state, { wsBody, wsResponse }) {
+      state.connections[state.connectionTab].bodies.push(wsBody)
+      state.connections[state.connectionTab].responses.push(wsResponse)
+      setTimeout(() => {
+        state.bodiesTab = state.connections[state.connectionTab].bodies.length - 1
+        state.responsesTab = state.connections[state.connectionTab].responses.length - 1
+      }, 80)
     },
     CREATE_COOKIE (state, { key, value }) {
-      const connectionId = state.connections[state.connectionTab]._id
-      return new Promise((resolve) => {
-        axios.post(connectionPath + '/create_cookie', {
-          connectionId,
-          key,
-          value
-        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(({ data: { key, value } }) => {
-            if (state.connections[state.connectionTab].cookies.some((c) => c.key === key)) {
-              state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.map((c) => {
-                if (c.key === key) c.value = value
-                return c
-              })
-            } else {
-              state.connections[state.connectionTab].cookies.push({ key, value })
-            }
-            resolve()
-          })
-          .catch(console.error)
-      })
+      if (state.connections[state.connectionTab].cookies.some((c) => c.key === key)) {
+        state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.map((c) => {
+          if (c.key === key) c.value = value
+          return c
+        })
+      } else {
+        state.connections[state.connectionTab].cookies.push({ key, value })
+      }
     },
     REMOVE_COOKIE (state, { key }) {
-      const connectionId = state.connections[state.connectionTab]._id
-      return new Promise((resolve) => {
-        axios.put(connectionPath + '/remove_cookie', {
-          connectionId,
-          key
-        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(() => {
-            state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.filter((c) => c.key !== key)
-            resolve()
-          })
-          .catch(console.error)
-      })
+      state.connections[state.connectionTab].cookies = state.connections[state.connectionTab].cookies.filter((c) => c.key !== key)
     },
     REMOVE_BODY (state, { bodyId }) {
-      const connectionId = state.connections[state.connectionTab]._id
-      return new Promise((resolve) => {
-        axios.put(connectionPath + '/remove_body', {
-          connectionId,
-          bodyId
-        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(() => {
-            state.connections[state.connectionTab].bodies = state.connections[state.connectionTab].bodies.filter((c) => c._id !== bodyId)
-            state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.filter((c) => c.bodyId !== bodyId)
-            resolve()
-          })
-          .catch(console.error)
-      })
+      state.connections[state.connectionTab].bodies = state.connections[state.connectionTab].bodies.filter((c) => c._id !== bodyId)
+      state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.filter((c) => c.bodyId !== bodyId)
     },
     REMOVE_RESPONSE (state, { responseId, contentId }) {
-      const connectionId = state.connections[state.connectionTab]._id
-      return new Promise((resolve) => {
-        axios.put(connectionPath + '/remove_response', {
-          connectionId,
-          responseId,
-          contentId
-        }, { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(() => {
-            state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.map((res) => {
-              if (res._id === responseId) {
-                res.contents = res.contents.filter((cont) => cont._id !== contentId)
-              }
-              return res
-            })
-            resolve()
-          })
-          .catch(console.error)
+      state.connections[state.connectionTab].responses = state.connections[state.connectionTab].responses.map((res) => {
+        if (res._id === responseId) {
+          res.contents = res.contents.filter((cont) => cont._id !== contentId)
+        }
+        return res
       })
     },
-    LOCAL_REGISTER (state, { name, email, password }) {
-      return new Promise((resolve) => {
-        axios.post(authPath + '/register', { name, email, password })
-          .then(async ({ data: { user } }) => {
-            await saveConnections({ user }, state)
-            localStorage.setItem('Token', user.token)
-            resolve()
-          })
-          .catch(() => {
-            state.authMessages = [{ msg: 'Auth failed', level: 'failed' }]
-          })
-      })
+    REMOVE_CONNECTION (state, { connectionId }) {
+      state.connections = state.connections.filter((connection) => connection._id !== connectionId)
     },
-    SOCIAL_AUTH (state, { userId }) {
-      return new Promise((resolve) => {
-        axios.get(userPath + '/get_social', { params: { userId } })
-          .then(async ({ data: { user } }) => {
-            localStorage.setItem('Token', user.token)
-            await saveConnections({ user }, state)
-            resolve()
-          })
-          .catch(() => {
-            state.authMessages = [{ msg: 'Auth failed', level: 'failed' }]
-          })
-      })
+    async SET_USER (state, user) {
+      await saveConnections({ user }, state)
+      state.user = user
+      state.authenticated = true
+      localStorage.setItem('Token', user.token)
+      this.dispatch('getConnections')
     },
-    SIGN_IN (state, { email, password }) {
-      return new Promise((resolve) => {
-        axios.post(authPath + '/login', { email, password })
-          .then(async ({ data: { user } }) => {
-            state.user = user
-            state.authenticated = true
-            localStorage.setItem('Token', user.token)
-            await this.dispatch('getConnections')
-            resolve()
-          })
-          .catch(() => {
-            state.authMessages = [{ msg: 'Auth failed', level: 'failed' }]
-          })
-      })
-    },
-    GET_CONNECTIONS (state) {
-      return new Promise((resolve) => {
-        axios.get(connectionPath + '/get_connections', { headers: { Authorization: 'Token ' + state.user.token || state.user.jwt } })
-          .then(({ data: { connections } }) => {
-            state.connections = processConnections({ connections })
-            resolve()
-          })
-          .catch(console.error)
-      })
+    GET_CONNECTIONS (state, connections) {
+      state.connections = processConnections({ connections })
     },
     LOGOUT (state) {
       localStorage.clear()
@@ -264,7 +131,9 @@ export default new Vuex.Store({
       state.queuedNextAction = fn
     },
     PUSH_MESSAGE (state, message) {
-      state.messages.unshift(message)
+      if (message) {
+        state.messages.unshift(message)
+      }
     },
     REMOVE_MESSAGE (state, { id }) {
       state.messages = state.messages.filter((m) => m.id !== id)
@@ -277,47 +146,161 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    init ({ commit }) {
-      commit('INIT')
+    async init ({ commit }) {
+      try {
+        const token = localStorage.getItem('Token')
+        const { data: { user } } = await axios.post(authPath + '/login', {}, { headers: { Authorization: 'Token ' + token } })
+        commit('SET_USER', user)
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[WELCOME] Sign in to save your state`, 'info'))
+      }
     },
-    pushResponse ({ commit }, args) {
-      commit('PUSH_RESPONSE', args)
+    async pushResponse ({ commit, getters }, { connectionId, bodyId, lang, wsSent, wsResponse }) {
+      try {
+        const user = getters.getUser
+        const connections = getters.getConnections
+        const connection = connections.find((c) => c._id === connectionId)
+        const response = connection.responses.find((r) => r.bodyId === bodyId)
+        const newResponse = { lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) }
+        const { data } = await axios.put(connectionPath + '/update_response', {
+          connectionId,
+          responseId: response._id,
+          wsResponse: newResponse
+        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('PUSH_RESPONSE', { wsResponse: data.wsResponse, response })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[RESPONSE] Server failed to add response`, 'warn'))
+      }
     },
     openSocket ({ commit }, args) {
       commit('OPEN_SOCKET', args)
     },
-    createConnection ({ commit }, { name, url }) {
-      commit('CREATE_CONNECTION', { name, url })
+    async createConnection ({ commit, getters }, { name, url }) {
+      try {
+        const user = getters.getUser
+        const { data } = await axios.post(connectionPath + '/create_connection', {
+          name,
+          url
+        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('CREATE_CONNECTION', { data })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[CONNECTION] Server failed to add connection`, 'warn'))
+      }
     },
-    createBody ({ commit }, { connectionId, name, url }) {
-      commit('CREATE_BODY', { connectionId, name, url })
+    async createBody ({ commit, getters }, { connectionId, name, url }) {
+      try {
+        const user = getters.getUser
+        const { data: { wsBody, wsResponse } } = await axios.post(connectionPath + '/create_body', {
+          connectionId,
+          name,
+          lang: 'JSON'
+        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('CREATE_BODY', { wsBody, wsResponse })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to add body`, 'warn'))
+      }
     },
-    createCookie ({ commit }, { key, value }) {
-      commit('CREATE_COOKIE', { key, value })
+    async createCookie ({ commit, getters }, { key, value }) {
+      try {
+        const user = getters.getUser
+        const connectionTab = getters.getConnectionTab
+        const connectionId = getters.getConnections[connectionTab]._id
+        await axios.post(connectionPath + '/create_cookie', {
+          connectionId,
+          key,
+          value
+        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('CREATE_COOKIE', { key, value })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to add cookie`, 'warn'))
+      }
     },
-    removeCookie ({ commit }, { key }) {
-      commit('REMOVE_COOKIE', { key })
+    async removeCookie ({ commit, getters }, { key }) {
+      try {
+        const user = getters.getUser
+        const connectionTab = getters.getConnectionTab
+        const connectionId = getters.getConnections[connectionTab]._id
+        await axios.put(connectionPath + '/remove_cookie', {
+          connectionId,
+          key
+        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('REMOVE_COOKIE', { key })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove cookie`, 'warn'))
+      }
     },
-    removeBody ({ commit }, { bodyId }) {
-      commit('REMOVE_BODY', { bodyId })
+    async removeBody ({ commit, getters }, { bodyId }) {
+      try {
+        const user = getters.getUser
+        const connectionTab = getters.getConnectionTab
+        const connectionId = getters.getConnections[connectionTab]._id
+        await axios.put(connectionPath + '/remove_body', {
+          connectionId,
+          bodyId
+        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('REMOVE_BODY', { bodyId })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove body`, 'warn'))
+      }
     },
-    removeResponse ({ commit }, { responseId, contentId }) {
-      commit('REMOVE_RESPONSE', { responseId, contentId })
+    async removeConnection ({ commit, getters }, { connectionId }) {
+      try {
+        const user = getters.getUser
+        await axios.delete(connectionPath + '/remove_connection/' + connectionId, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('REMOVE_CONNECTION', { connectionId })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove connection`, 'warn'))
+      }
     },
-    localRegister ({ commit }, { name, email, password }) {
-      commit('LOCAL_REGISTER', { name, email, password })
+    async removeResponse ({ commit, getters }, { responseId, contentId }) {
+      try {
+        const user = getters.getUser
+        const connectionId = getters.getConnections[getters.getConnectionTab]._id
+        await axios.put(connectionPath + '/remove_response', {
+          connectionId,
+          responseId,
+          contentId
+        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('REMOVE_RESPONSE', { responseId, contentId })
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove response`, 'warn'))
+      }
     },
-    socialAuth ({ commit }, { userId }) {
-      commit('SOCIAL_AUTH', { userId })
+    async localRegister ({ commit }, { name, email, password }) {
+      try {
+        const { data: { user } } = await axios.post(authPath + '/register', { name, email, password })
+        commit('SET_USER', user)
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[AUTHENTICATION] Invalid credentials`, 'warn'))
+      }
     },
-    signIn ({ commit }, { email, password }) {
-      commit('SIGN_IN', { email, password })
+    async socialAuth ({ commit }, { userId }) {
+      try {
+        const { data: { user } } = await axios.get(userPath + '/get_social', { params: { userId } })
+        commit('SET_USER', user)
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[AUTHENTICATION] Invalid credentials`, 'warn'))
+      }
+    },
+    async signIn ({ commit }, { email, password }) {
+      try {
+        const { data: { user } } = await axios.post(authPath + '/login', { email, password })
+        commit('SET_USER', user)
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[AUTHENTICATION] Invalid credentials`, 'warn'))
+      }
     },
     logout ({ commit }) {
       commit('LOGOUT')
     },
-    getConnections ({ commit }) {
-      commit('GET_CONNECTIONS')
+    async getConnections ({ commit, getters }) {
+      try {
+        const user = getters.getUser
+        const { data: { connections } } = await axios.get(connectionPath + '/get_connections', { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        commit('GET_CONNECTIONS', connections)
+      } catch (error) {
+        commit('PUSH_MESSAGE', Message(`[CONNECTIONS] Server failed to get connections`, 'warn'))
+      }
     },
     setConnectionTab ({ commit }, index) {
       commit('SET_CONNECTION_TAB', index)

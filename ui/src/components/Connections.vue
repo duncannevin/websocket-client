@@ -15,7 +15,7 @@
           @dblclick="renameConnection($event, ind)">
           {{connection.name}}
         </span>
-        <span class="delete-button" @click="deleteConnection(ind)">&#215;</span>
+        <span class="delete-button" @click="deleteConnection(connection._id)">&#215;</span>
       </template>
       <connection
         :connection="connection"
@@ -66,8 +66,8 @@ export default {
         this.$root.$emit('bv::show::modal', 'Add-connection')
       }
     },
-    deleteConnection (ind) {
-      this.connections.splice(ind, 1)
+    deleteConnection (connectionId) {
+      this.$store.dispatch('removeConnection', { connectionId })
     },
     renameConnection (evt, ind) {
       console.log('RENAME CONNECTION', ind)

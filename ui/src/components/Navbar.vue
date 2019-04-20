@@ -1,9 +1,9 @@
 <template>
   <b-navbar variant="faded" type="dark">
-    <b-navbar-brand href="#">Awesome Websocket Client</b-navbar-brand>
+    <b-navbar-brand href="#">Websocket Client</b-navbar-brand>
     <b-navbar-nav class="ml-auto">
-      <b-nav-item v-if="!authenticated" @click="openAuth">Sign In</b-nav-item>
-      <b-nav-item v-else @click="logout">Sign Out</b-nav-item>
+      <b-nav-item v-if="!authenticated" @click="openAuth">SIGN IN</b-nav-item>
+      <b-nav-item v-else @click="logout">SIGN OUT {{user.name.toUpperCase()}}</b-nav-item>
     </b-navbar-nav>
 </b-navbar>
 </template>
