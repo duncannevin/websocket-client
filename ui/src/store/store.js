@@ -14,6 +14,7 @@ Vue.use(Vuex)
 
 function processConnections ({ connections }) {
   return connections.map((connection) => {
+    connection.responses.map(response => response.contents.reverse())
     return Object.assign(connection, { ws: new Ws(connection) })
   })
 }

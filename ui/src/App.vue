@@ -39,6 +39,8 @@ export default {
 body
   background: $black
   font-family: $font-family-monospace
+  height: 100%
+  overflow: hidden
 .container-fluid
   padding-left: 0
   padding-right: 0
