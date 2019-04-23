@@ -7,7 +7,7 @@ services:
     volumes:
       - /mongo/data/websocket_client:/data/db
     env_file:
-      - .env.mongo
+      - .env
     ports:
       - 27017:27017
     restart: always
