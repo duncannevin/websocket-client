@@ -26,7 +26,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   ]
 })
 
-// no need for app entry during tests
+// no need for server entry during tests
 delete webpackConfig.entry
 
 module.exports = webpackConfig
