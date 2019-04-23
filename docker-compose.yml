@@ -13,7 +13,7 @@ services:
     restart: always
     networks:
       - nginxproxy
-  
+
   websocket_client:
     container_name: websocket_client
     build: .
@@ -26,11 +26,6 @@ services:
       MONGO_URI: "${MONGO_URI}"
     ports:
       - 3000:3000
-
-  networks:
-    nginxproxy:
-      external:
-        name: nginxproxy
 
   nginx:
     image: nginx:1.15-alpine
