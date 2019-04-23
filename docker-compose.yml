@@ -16,8 +16,6 @@ services:
     container_name: websocket_client
     build: .
     restart: always
-    networks:
-      - nginx:1.15-alpine
     env_file:
       - .env
     environment:
@@ -35,8 +33,6 @@ services:
     ports:
       - 27017:27017
     restart: always
-    networks:
-      - nginx:1.15-alpine
 
   certbot:
     image: certbot/certbot
