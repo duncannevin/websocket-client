@@ -1,19 +1,6 @@
 version: "2"
 
 services:
-  mongo:
-    container_name: db
-    image: mongo
-    volumes:
-      - /mongo/data/websocket_client:/data/db
-    env_file:
-      - .env
-    ports:
-      - 27017:27017
-    restart: always
-    networks:
-      - nginxproxy
-
   websocket_client:
     container_name: websocket_client
     build: .
@@ -26,6 +13,17 @@ services:
       MONGO_URI: "${MONGO_URI}"
     ports:
       - 3000:3000
+
+  mongo:
+    container_name: db
+    image: mongo
+    volumes:
+      - /mongo/data/websocket_client:/data/db
+    env_file:
+      - .env
+    ports:
+      - 27017:27017
+    restart: always
 
   nginx:
     image: nginx:1.15-alpine
@@ -44,3 +42,4 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
