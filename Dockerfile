@@ -5,8 +5,9 @@ MAINTAINER duncan nevin <duncan.nevin@gmail.com>
 WORKDIR /usr/src/app/websocket_client
 
 COPY package.json yarn.lock ./
-RUN yarn
+RUN npm install
+RUN npm audit fix
 COPY . .
-RUN yarn run build
+RUN npm run build
 EXPOSE 3000
-CMD ["yarn", "run", "start"]
+CMD ["npm", "start"]
