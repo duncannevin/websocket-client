@@ -17,7 +17,7 @@ services:
     build: .
     restart: always
     networks:
-      - nginxproxy
+      - nginx
     env_file:
       - .env
     environment:
@@ -36,7 +36,7 @@ services:
       - 27017:27017
     restart: always
     networks:
-      - nginxproxy
+      - nginx
 
   certbot:
     image: certbot/certbot
