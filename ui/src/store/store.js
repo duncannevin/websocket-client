@@ -12,6 +12,12 @@ const userPath = '/users'
 
 Vue.use(Vuex)
 
+function authHeader () {
+  const user = store.getters.getUser
+  const token = user.token || user.jwt
+  return token ? { Authorization: 'Token ' + token } : {}
+}
+
 function processConnections ({ connections }) {
   return connections.map((connection) => {
     connection.responses.map(response => response.contents.reverse())
@@ -35,11 +41,13 @@ function saveConnections ({ user }, state) {
         localStorage.removeItem('connections-cache')
         resolve()
       })
-      .catch(console.error)
+      .catch(() => {
+        store.dispatch('pushMessage', Message(`[CONNECTION] Server failed to add connections`, 'warn'))
+      })
   })
 }
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
     connections: [],
     authenticated: false,
@@ -149,17 +157,21 @@ export default new Vuex.Store({
   },
   actions: {
     async init ({ commit }) {
+      function signin () {
+        commit('PUSH_MESSAGE', Message(`[WELCOME] Sign in to save your state`, 'info'))
+      }
+
       try {
         const token = localStorage.getItem('Token')
+        if (!token) return signin()
         const { data: { user } } = await axios.post(authPath + '/login', {}, { headers: { Authorization: 'Token ' + token } })
         commit('SET_USER', user)
       } catch (error) {
-        commit('PUSH_MESSAGE', Message(`[WELCOME] Sign in to save your state`, 'info'))
+        signin()
       }
     },
     async pushResponse ({ commit, getters }, { connectionId, bodyId, lang, wsSent, wsResponse }) {
       try {
-        const user = getters.getUser
         const connections = getters.getConnections
         const connection = connections.find((c) => c._id === connectionId)
         const response = connection.responses.find((r) => r.bodyId === bodyId)
@@ -168,7 +180,7 @@ export default new Vuex.Store({
           connectionId,
           responseId: response._id,
           wsResponse: newResponse
-        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        }, { headers: authHeader() })
         commit('PUSH_RESPONSE', { wsResponse: data.wsResponse, response })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[RESPONSE] Server failed to add response`, 'warn'))
@@ -179,24 +191,22 @@ export default new Vuex.Store({
     },
     async createConnection ({ commit, getters }, { name, url }) {
       try {
-        const user = getters.getUser
         const { data } = await axios.post(connectionPath + '/create_connection', {
           name,
           url
-        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        }, { headers: authHeader() })
         commit('CREATE_CONNECTION', { data })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[CONNECTION] Server failed to add connection`, 'warn'))
       }
     },
-    async createBody ({ commit, getters }, { connectionId, name, url }) {
+    async createBody ({ commit, getters }, { connectionId, name }) {
       try {
-        const user = getters.getUser
         const { data: { wsBody, wsResponse } } = await axios.post(connectionPath + '/create_body', {
           connectionId,
           name,
           lang: 'JSON'
-        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        }, { headers: authHeader() })
         commit('CREATE_BODY', { wsBody, wsResponse })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[BODY] Server failed to add body`, 'warn'))
@@ -204,14 +214,13 @@ export default new Vuex.Store({
     },
     async createCookie ({ commit, getters }, { key, value }) {
       try {
-        const user = getters.getUser
         const connectionTab = getters.getConnectionTab
         const connectionId = getters.getConnections[connectionTab]._id
         await axios.post(connectionPath + '/create_cookie', {
           connectionId,
           key,
           value
-        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        }, { headers: authHeader() })
         commit('CREATE_COOKIE', { key, value })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[BODY] Server failed to add cookie`, 'warn'))
@@ -219,13 +228,12 @@ export default new Vuex.Store({
     },
     async removeCookie ({ commit, getters }, { key }) {
       try {
-        const user = getters.getUser
         const connectionTab = getters.getConnectionTab
         const connectionId = getters.getConnections[connectionTab]._id
         await axios.put(connectionPath + '/remove_cookie', {
           connectionId,
           key
-        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        }, { headers: authHeader() })
         commit('REMOVE_COOKIE', { key })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove cookie`, 'warn'))
@@ -233,13 +241,12 @@ export default new Vuex.Store({
     },
     async removeBody ({ commit, getters }, { bodyId }) {
       try {
-        const user = getters.getUser
         const connectionTab = getters.getConnectionTab
         const connectionId = getters.getConnections[connectionTab]._id
         await axios.put(connectionPath + '/remove_body', {
           connectionId,
           bodyId
-        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        }, { headers: authHeader() })
         commit('REMOVE_BODY', { bodyId })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove body`, 'warn'))
@@ -247,8 +254,7 @@ export default new Vuex.Store({
     },
     async removeConnection ({ commit, getters }, { connectionId }) {
       try {
-        const user = getters.getUser
-        await axios.delete(connectionPath + '/remove_connection/' + connectionId, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        await axios.delete(connectionPath + '/remove_connection/' + connectionId, { headers: authHeader() })
         commit('REMOVE_CONNECTION', { connectionId })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove connection`, 'warn'))
@@ -256,13 +262,12 @@ export default new Vuex.Store({
     },
     async removeResponse ({ commit, getters }, { responseId, contentId }) {
       try {
-        const user = getters.getUser
         const connectionId = getters.getConnections[getters.getConnectionTab]._id
         await axios.put(connectionPath + '/remove_response', {
           connectionId,
           responseId,
           contentId
-        }, { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        }, { headers: authHeader() })
         commit('REMOVE_RESPONSE', { responseId, contentId })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove response`, 'warn'))
@@ -295,10 +300,9 @@ export default new Vuex.Store({
     logout ({ commit }) {
       commit('LOGOUT')
     },
-    async getConnections ({ commit, getters }) {
+    async getConnections ({ commit }) {
       try {
-        const user = getters.getUser
-        const { data: { connections } } = await axios.get(connectionPath + '/get_connections', { headers: { Authorization: 'Token ' + user.token || user.jwt } })
+        const { data: { connections } } = await axios.get(connectionPath + '/get_connections', { headers: authHeader() })
         commit('GET_CONNECTIONS', connections)
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[CONNECTIONS] Server failed to get connections`, 'warn'))
@@ -341,3 +345,5 @@ export default new Vuex.Store({
     getUser: state => state.user
   }
 })
+
+export default store
