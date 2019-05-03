@@ -1,6 +1,9 @@
 <template>
   <b-navbar variant="faded" type="dark">
-    <b-navbar-brand href="#">Websocket Client</b-navbar-brand>
+    <b-navbar-brand href="#">
+      <img class="ws-client-icon" src="../../static/websocket-client-icon.png">
+      Websocket Client
+    </b-navbar-brand>
     <b-navbar-nav class="ml-auto">
       <b-nav-item v-if="!authenticated" @click="openAuth">SIGN IN</b-nav-item>
       <b-nav-item v-else @click="logout">SIGN OUT {{user.name.toUpperCase()}}</b-nav-item>
@@ -45,4 +48,7 @@ export default {
     top: 80%
     height: 2px
     background-color: $white
+.ws-client-icon
+  height: 2rem
+  width: auto
 </style>
