@@ -6,7 +6,7 @@
     <navbar></navbar>
     <router-view/>
 
-    <div id="donate-btn">
+    <div id="donate-btn" class="ws-add">
       <p>Help keep the lights on. </p>&nbsp;
       <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
         <input type="hidden" name="cmd" value="_s-xclick" />
@@ -15,6 +15,9 @@
         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
       </form>
       <p>Thank you!</p>
+    </div>
+    <div id="about-dev" class="ws-add">
+      <p>Hire <a href="https://github.com/duncannevin" target="_blank">Duncan Nevin</a> for your next project.</p>
     </div>
   </div>
 </template>
@@ -158,11 +161,19 @@ body
 .loader-dot:nth-child(3)
   animation-delay: 500ms
 
-#donate-btn
+.ws-add
   display: flex
   color: $green
   position: fixed
+  padding: 0 1rem
+#donate-btn
   bottom: 0
   left: 0
-  padding: 1rem
+#about-dev
+  flex-direction: column
+  bottom: 0
+  right: 0
+  padding-bottom: 0.75rem
+  p
+    margin: 0
 </style>
