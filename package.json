@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm run build & node server/bin/www",
+    "start": "node server/bin/www",
     "dev": "nodemon server/bin/www & webpack-dev-server --inline --progress --config ui/build/webpack.dev.conf.js",
     "test": "mocha",
     "lint": "eslint --ext .js,.vue src test/unit",
