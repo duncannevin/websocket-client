@@ -17,6 +17,7 @@ A websocket client that is actually useful for those of us hardcore websocket pr
 
 - [NodeJS v-8.XX](https://nodejs.org/en/download/) 
 - [Yarn](https://yarnpkg.com/en/)
+- [Docker](https://www.docker.com/)
 
 ##### Api Keys
 
@@ -39,7 +40,7 @@ A websocket client that is actually useful for those of us hardcore websocket pr
 
 ```
 // dev
-> yarn run dev
+> docker-compose -f docker-compose.dev.yml up --build
 // production
-> yarn start
+> docker-compose up --build
 ```

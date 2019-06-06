@@ -4,13 +4,16 @@ version: '3'
 # When containers are opened with compose
 # the networking is handled automatically.
 services: 
+  web: # application
+    build:
+      context: . 
+      dockerfile: Dockerfile
+    ports: 
+      - "3000:3000"
   mongo-server: # database
     container_name: mongo
     image: mongo
+    volumes:
+      - /home/var/lib/mongodb
     ports:
       - "27017:27017"
-  app: # application
-    restart: always # restart container always
-    build: . # location of Dockerfile
-    ports: 
-      - "3000:3000" # exposed:in-image

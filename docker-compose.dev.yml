@@ -1,0 +1,30 @@
+# specify docker compose version
+version: '3' 
+# Container that should be started 
+# When containers are opened with compose
+# the networking is handled automatically.
+services: 
+  mongo-server: # database
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
+  app: # application
+    build:
+      context: . 
+      dockerfile: Dockerfile.dev
+    ports: 
+      - "8080:8080"
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: ["npm", "run", "dev"]
+  tests: # tests
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: ["npm", "run", "test"]
