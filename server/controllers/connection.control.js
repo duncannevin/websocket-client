@@ -10,10 +10,6 @@ class ConnectionControl {
       const { connections } = req.body
       const preparedConnections = await Promise.all(connections.map(async (connection) => {
         connection.userId = id
-        connection.bodies = connection.bodies.map((body) => {
-          body._id = Types.ObjectId(body._id)
-          return body
-        })
         connection.responses = connection.responses.map((response) => {
           response._id = Types.ObjectId(response._id)
           return response
@@ -76,23 +72,15 @@ class ConnectionControl {
     }
   }
 
-  async createWsBody (req, res, next) {
+  async updateBody (req, res, next) {
     try {
-      const { connectionId, name } = req.body
-      let wsBody = Object.assign({ name }, { content: '', lang: 'json' })
-      let wsResponse = { bodyName: name, contents: [] }
+      const { _id, content, lang } = req.body
       if (req.hasOwnProperty('payload')) {
-        wsBody = await connectionDAO.saveBody({ connectionId, wsBody })
-        wsResponse.bodyId = wsBody._id
-        wsResponse = await connectionDAO.saveResponse({ connectionId, wsResponse })
-      } else {
-        wsBody._id = Types.ObjectId()
-        wsResponse.bodyId = wsBody._id
-        wsResponse._id = Types.ObjectId()
-      }
-      res.status(201).send({ wsBody, wsResponse })
+        await connectionDAO.updateBody({ _id, content, lang })
+      }  
+      res.status(201).send({ updatedContent: content, updatedLang: lang })
     } catch (error) {
-      connectionLogger.debug('[createBody]', error)
+      connectionLogger.debug('[createConnection]', error)
       res.status(400).send({ msg: error.message, code: 400 })
     }
   }
@@ -132,18 +120,6 @@ class ConnectionControl {
         await connectionDAO.deleteCookie({ connectionId, key })
       }
       res.status(200).clearCookie(key).send()
-    } catch (error) {
-      res.status(400).send({ msg: error.message, code: 400 })
-    }
-  }
-
-  async removeBody (req, res, next) {
-    try {
-      const { connectionId, bodyId } = req.body
-      if (req.hasOwnProperty('payload')) {
-        await connectionDAO.deleteBody({ connectionId, bodyId })
-      }
-      res.status(200).send()
     } catch (error) {
       res.status(400).send({ msg: error.message, code: 400 })
     }

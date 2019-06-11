@@ -12,12 +12,8 @@ const Header = {
 }
 
 const Response = {
-  bodyName: String,
-  bodyId: String,
-  lang: String,
   contents: [{
     lang: String,
-    wsSent: Body,
     wsResponse: String
   }]
 }
@@ -41,13 +37,22 @@ const ConnectionSchema = new mongoose.Schema(
       type: [Header],
       default: []
     },
-    bodies: {
-      type: [Body],
-      default: []
+    body: {
+      type: Body,
+      default: {
+        name: 'untitled',
+        lang: 'json',
+        content: ''
+      }
     },
     responses: {
       type: [Response],
-      default: []
+      default: [
+        {
+          lang: 'json',
+          wsResponse: ''
+        }
+      ]
     }
   }
 )

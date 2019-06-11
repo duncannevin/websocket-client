@@ -9,7 +9,7 @@
         :active="activeTab === ind"
         @click="activeTab = ind"
       >
-        <bodies v-if="tab[0] === 'bodies'" :ws="connection.ws" :bodies="tab[1]" :responses="tab[2]"></bodies>
+        <ws-body v-if="tab[0] === 'body'" :ws="connection.ws" :body-data="tab[1]"></ws-body>
         <cookies v-if="tab[0] === 'cookies'" :cookies="tab[1]"></cookies>
       </b-tab>
     </b-tabs>
@@ -18,13 +18,13 @@
 </template>
 
 <script>
-import Bodies from './Bodies'
+import WSBody from './WSBody'
 import Cookies from './Cookies'
 export default {
   name: 'RequestSection',
   computed: {
     dataInOrder () {
-      return [['bodies', this.connection.bodies, this.connection.responses], ['cookies', this.connection.cookies]]
+      return [['body', this.connection.body], ['cookies', this.connection.cookies]]
     }
   },
   data () {
@@ -33,7 +33,7 @@ export default {
     }
   },
   components: {
-    Bodies,
+    WsBody: WSBody,
     Cookies
   },
   props: ['connection', 'authenticated']

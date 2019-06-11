@@ -29,35 +29,17 @@
                   class="section response-editor"
                 >
                   <div class="display">
-                    <div class="ws-sent-display">
-                      <ace-editor
-                        :value="content.wsSent.content"
-                        @init="editorInit"
-                        :theme="theme"
-                        :lang="content.wsSent.lang"
-                        height="100%"
-                        width="100%"
-                      ></ace-editor>
-                      <span class="display-title">Sent</span>
-                    </div>
                     <div class="ws-response-display">
                       <ace-editor
                         v-model="content.wsResponse"
                         @init="editorInit"
                         :theme="theme"
-                        :lang="content.lang"
+                        :lang="getFormat(content.wsResponse)"
                         height="100%"
                         width="100%"
                       ></ace-editor>
                       <span class="display-title">Response</span>
                       <b-button-group class="section-controls" size="sm">
-                        <b-dropdown right :text="content.lang.toUpperCase()">
-                          <b-dropdown-item
-                            v-for="(lang, ind) in langs"
-                            :key="'response-lang-' + ind"
-                            @click="changeLang(lang, response.contents[cInd])"
-                          >{{lang.toUpperCase()}}</b-dropdown-item>
-                        </b-dropdown>
                         <b-button class="delete-button" @click="deleteResponse(response._id, content._id)">&#215;</b-button>
                       </b-button-group>
                     </div>
@@ -78,6 +60,7 @@
 
 <script>
 import AceEditor from 'vue2-ace-editor'
+import {detectFormat} from '../utils'
 export default {
   name: 'ResponseSection',
   computed: {
@@ -116,6 +99,9 @@ export default {
     },
     changeLang (lang, res) {
       res.lang = lang
+    },
+    getFormat (txt) {
+      return detectFormat(txt)
     }
   },
   components: {
@@ -136,17 +122,12 @@ export default {
     overflow: hidden
     &:not(:first-child) .display
       height: 100px
-    .ws-sent-display, .ws-response-display
+    .ws-response-display
       position: relative
       display: inline
       height: 100%
       float: left
-    .ws-sent-display
-      width: 35%
-      max-width: 35%
-    .ws-response-display
-      width: 65%
-      max-width: 65%
+      width: 100%
     &:hover
       cursor: not-allowed
 .delete-button

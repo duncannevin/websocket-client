@@ -8,7 +8,6 @@ class Ws {
     this.connectionId = _id
     this.connected = false
     this._ws = null
-    this._lastBody = null
 
     this.openSocket = this.openSocket.bind(this)
     this.closeSocket = this.closeSocket.bind(this)
@@ -32,9 +31,6 @@ class Ws {
     this._ws.onmessage = ({ data }) => {
       $store.dispatch('pushResponse', {
         connectionId: this.connectionId,
-        bodyId: this._lastBody._id,
-        lang: this._lastBody.lang,
-        wsSent: this._lastBody,
         wsResponse: data
       })
     }

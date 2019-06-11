@@ -35,20 +35,6 @@ class ConnectionDAO {
 
   /**
    * @param connectionId
-   * @param wsbody
-   * @return {Promise<*>}
-   */
-  async saveBody ({ connectionId, wsBody }) {
-    const updated = await ConnectionRepository.findOneAndUpdate(
-      { _id: connectionId },
-      { $push: { bodies: wsBody } },
-      { new: true }
-    )
-    return updated.bodies[updated.bodies.length - 1]
-  }
-
-  /**
-   * @param connectionId
    * @param wsResponse
    * @return {Promise<*>}
    */
@@ -76,6 +62,15 @@ class ConnectionDAO {
     return updated.responses.find((res) => res._id.toString() === responseId).contents.slice(-1).pop()
   }
 
+  async updateBody ({ _id, content, lang }) {
+    const updated = await ConnectionRepository.findOneAndUpdate(
+      { _id },
+      { 'body.content': content, 'body.lang': lang},
+      { new: true }
+    )
+    return updated
+  }
+
   async saveCookie ({ connectionId, key, value }) {
     return await ConnectionRepository.updateOne(
       { _id: connectionId },
@@ -90,20 +85,6 @@ class ConnectionDAO {
       { multi: true, new: true }
     )
     return updated.cookies
-  }
-
-  async deleteBody ({ connectionId, bodyId }) {
-    const updated = await ConnectionRepository.findOneAndUpdate(
-      { _id: connectionId },
-      {
-        $pull: {
-          bodies: { _id: bodyId },
-          responses: { bodyId }
-        }
-      },
-      { multi: true, new: true }
-    )
-    return updated.bodies
   }
 
   async deleteResponse ({ connectionId, responseId, contentId }) {

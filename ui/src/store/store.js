@@ -1,7 +1,7 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import Ws from '../services/Ws'
-import { formatResponse, makeResizable } from '../utils'
+import { formatResponse, makeResizable, detectFormat } from '../utils'
 import axios from 'axios'
 import { $root } from '../main'
 import { Message } from '../services/Message'
@@ -69,13 +69,12 @@ const store = new Vuex.Store({
       state.connections.push(data)
       state.connectionTab = state.connections.length - 1
     },
-    CREATE_BODY (state, { wsBody, wsResponse }) {
-      state.connections[state.connectionTab].bodies.push(wsBody)
-      state.connections[state.connectionTab].responses.push(wsResponse)
-      setTimeout(() => {
-        state.bodiesTab = state.connections[state.connectionTab].bodies.length - 1
-        state.responsesTab = state.connections[state.connectionTab].responses.length - 1
-      }, 80)
+    UPDATE_BODY (state, { _id, updatedContent, updatedLang }) {
+      const connection = state.connections.find(c => c._id === _id)
+      if (connection) {
+        connection.body.content = updatedContent
+        connection.body.lang = updatedLang
+      }
     },
     CREATE_COOKIE (state, { key, value }) {
       if (state.connections[state.connectionTab].cookies.some((c) => c.key === key)) {
@@ -121,7 +120,6 @@ const store = new Vuex.Store({
       state.authenticated = false
       state.user = {}
       state.connectionTab = 0
-      state.bodiesTab = 0
       state.responsesTab = 0
       state.queuedNextAction = () => {}
       state.messages = []
@@ -170,12 +168,13 @@ const store = new Vuex.Store({
         signin()
       }
     },
-    async pushResponse ({ commit, getters }, { connectionId, bodyId, lang, wsSent, wsResponse }) {
+    async pushResponse ({ commit, getters }, { connectionId, wsResponse }) {
       try {
         const connections = getters.getConnections
         const connection = connections.find((c) => c._id === connectionId)
-        const response = connection.responses.find((r) => r.bodyId === bodyId)
-        const newResponse = { lang, wsSent, wsResponse: formatResponse({ lang, wsResponse }) }
+        const responsesTab = getters.getResponsesTab
+        const response = connection.responses[responsesTab]
+        const newResponse = { lang: detectFormat(wsResponse), wsResponse: formatResponse({ wsResponse }) }
         const { data } = await axios.put(connectionPath + '/update_response', {
           connectionId,
           responseId: response._id,
@@ -200,16 +199,14 @@ const store = new Vuex.Store({
         commit('PUSH_MESSAGE', Message(`[CONNECTION] Server failed to add connection`, 'warn'))
       }
     },
-    async createBody ({ commit, getters }, { connectionId, name }) {
+    async updateBody ({ commit, getters }) {
       try {
-        const { data: { wsBody, wsResponse } } = await axios.post(connectionPath + '/create_body', {
-          connectionId,
-          name,
-          lang: 'JSON'
-        }, { headers: authHeader() })
-        commit('CREATE_BODY', { wsBody, wsResponse })
+        const connectionTab = getters.getConnectionTab
+        const { _id, body: { content, lang } } = getters.getConnections[connectionTab]
+        const { data: { updatedContent, updatedLang } } = await axios.put(connectionPath + '/update_body', { _id, content, lang }, { headers: authHeader() })
+        commit('UPDATE_BODY', { _id, updatedContent, updatedLang })
       } catch (error) {
-        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to add body`, 'warn'))
+        commit('PUSH_MESSAGE', Message(`[BODY] Failed to update body`, 'warn'))
       }
     },
     async createCookie ({ commit, getters }, { key, value }) {
@@ -237,19 +234,6 @@ const store = new Vuex.Store({
         commit('REMOVE_COOKIE', { key })
       } catch (error) {
         commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove cookie`, 'warn'))
-      }
-    },
-    async removeBody ({ commit, getters }, { bodyId }) {
-      try {
-        const connectionTab = getters.getConnectionTab
-        const connectionId = getters.getConnections[connectionTab]._id
-        await axios.put(connectionPath + '/remove_body', {
-          connectionId,
-          bodyId
-        }, { headers: authHeader() })
-        commit('REMOVE_BODY', { bodyId })
-      } catch (error) {
-        commit('PUSH_MESSAGE', Message(`[BODY] Server failed to remove body`, 'warn'))
       }
     },
     async removeConnection ({ commit, getters }, { connectionId }) {
